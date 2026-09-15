@@ -2,13 +2,20 @@
 AGENTS.md
 PLANIFICACION.md
 
-# Dependencias, compilación y secretos locales
+
+# Dependencias y resultados generados localmente
 node_modules/
 dist/
-.env.local
-.env.*.local
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
 
-# docs
-/docs
+# Configuración local y secretos (el ejemplo sí se versiona)
+.env
+.env.*
+!.env.example
 
-/Diseños
+# Archivos temporales y de diagnóstico
+*.log
+.DS_Store

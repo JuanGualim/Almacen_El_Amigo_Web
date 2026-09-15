@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#f7f9fb;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-container": "#7991af", "on-secondary-fixed": "#002115", "primary": "#001428", "on-background": "#191c1e", "background": "#f7f9fb", "on-tertiary-fixed-variant": "#6e3900", "on-tertiary-fixed": "#2f1500", "secondary-fixed": "#89f7c9", "surface-container-low": "#f2f4f6", "on-tertiary-container": "#d77503", "surface-variant": "#e0e3e5", "surface-dim": "#d8dadc", "surface-container-lowest": "#ffffff", "tertiary": "#220e00", "inverse-surface": "#2d3133", "on-primary-fixed-variant": "#314863", "surface-container-highest": "#e0e3e5", "on-tertiary": "#ffffff", "primary-fixed": "#d1e4ff", "on-surface-variant": "#43474d", "on-primary": "#ffffff", "outline-variant": "#c3c6ce", "surface-bright": "#f7f9fb", "tertiary-fixed-dim": "#ffb77d", "secondary-container": "#86f5c6", "surface-container": "#eceef0", "inverse-primary": "#b0c9e8", "on-secondary-fixed-variant": "#00513a", "surface-tint": "#49607c", "tertiary-fixed": "#ffdcc3", "outline": "#74777e", "surface": "#f7f9fb", "error-container": "#ffdad6", "surface-container-high": "#e6e8ea", "primary-container": "#0f2942", "on-error": "#ffffff", "secondary": "#006c4e", "on-secondary": "#ffffff", "primary-fixed-dim": "#b0c9e8", "on-secondary-container": "#007151", "on-primary-fixed": "#011d35", "error": "#ba1a1a", "tertiary-container": "#401f00", "secondary-fixed-dim": "#6cdbae", "on-error-container": "#93000a", "inverse-on-surface": "#eff1f3", "on-surface": "#191c1e" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, spacing: { "space-xs": "0.25rem", "margin": "1rem", "gutter": "1rem", "margin-tablet": "1.5rem", "space-xl": "2rem", "space-sm": "0.5rem", "space-md": "1rem", "margin-desktop": "2rem", "gutter-desktop": "1.5rem", "space-lg": "1.5rem", "gutter-tablet": "1.25rem" }, fontFamily: { "headline-lg": ["Plus Jakarta Sans"], "numeric-pos": ["Plus Jakarta Sans"], "body-md": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "label-lg": ["Inter"], "title-md": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "title-lg": ["Inter"], "display-lg": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "display-lg-mobile": ["Plus Jakarta Sans"], "body-lg": ["Inter"] }, fontSize: { "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "numeric-pos": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "title-md": ["16px", { "lineHeight": "22px", "fontWeight": "600" }], "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }], "title-lg": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "display-lg-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen antialiased"><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-20 px-space-md flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0 flex-1"><img alt="Logo Almacén El Amigo" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1UlmmAFGClON6I9bwLajiLY8fUPZLvZegrlhzuvSkozJx3m3-FKE1uu_77T088ZWY3SND-YYxMiLshrARhSlX8hKCiCtK0LB15CdBhN-EfHAXjI13FBbqB3Q7xrYjtJO-oDoWgzNejZ3JnSqFxKHO2V0l2wYbq4HaGtz00Z-Golj6c7kWJ0ifq1SBs5PCxbXoUec8umrJ2TeAnHcLJado1dXDS3KQsUh46q0qDYO0gH7Emf4OqzaZP6sGfj"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-1"><button class="flex items-center gap-1 text-left group min-w-0 max-w-[170px]" type="button"><span class="font-title-md text-title-md text-primary font-bold truncate group-hover:text-secondary transition-colors">Almacén El Amigo</span><span class="material-symbols-outlined text-[18px] text-on-surface-variant flex-shrink-0">arrow_drop_down</span></button></div><div class="flex items-center gap-space-xs"><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Sucursal Central</span><span class="text-outline-variant text-[10px]">•</span><div class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span><span class="font-label-sm text-[10px] leading-tight font-semibold">En línea</span></div></div></div></div><div class="flex items-center gap-1 flex-shrink-0"><button aria-label="Notificaciones" class="relative w-11 h-11 flex items-center justify-center rounded-xl text-on-surface-variant hover:bg-surface-container active:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><div class="flex items-center justify-center p-0.5"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVwzWkD9ktYcLcRw4D55SX5EjTv4lXa9R_QHf-ovE7STjs704ZiSUsPrTRJ4thKVtY6PW5YWUchVnC0Dlv0r3Q9Zi-oc_bAnwID85Q-KFRhCb-O07UpN3jjnaDtDHSaDrEvQg3Zb5Wz_fNbcaLm0gf-LWUfG4MfLDzknKSF6qtMRh2wgYECSUQYO2uK4hHkKXYNPOE8jbLZl1w83mdedor44shRhO7AuFVyScDpqok6bwkL5ty16LVIA"/></div></div></div></header><main class="flex flex-col relative w-full pt-20 pb-24 bg-surface flex-1 min-h-0"><div class="flex flex-col w-full">
+<!-- PWA Sincronización / Estado Local Offline (Discreto y seguro) -->
+<div class="w-full bg-surface-container-high px-space-md py-1.5 flex items-center justify-between text-on-surface-variant">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="inline-block w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-sm text-label-sm truncate">Modo POS Offline Activo • Respaldo local instantáneo</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant flex-shrink-0">
+<span class="material-symbols-outlined text-[15px]">cloud_done</span>
+<span class="font-label-sm text-[10px] font-semibold">Listo</span>
+</div>
+</div>
+<!-- Buscador Táctil Rápido y Lector de Barra -->
+<div class="px-space-md pt-3 pb-2 flex flex-col gap-2.5">
+<div class="flex items-center gap-2">
+<div class="relative flex-1 flex items-center bg-surface-container-lowest rounded-xl shadow-sm">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full h-12 pl-10 pr-3 bg-transparent text-primary placeholder:text-outline font-body-md text-body-md focus:outline-none focus:ring-0" id="pos-search-input" placeholder="Buscar prenda, código, talla (ej: Gabardina 32)..." type="text"/>
+<button aria-label="Limpiar búsqueda" class="p-2 text-outline hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</button>
+</div>
+<!-- Botón Escáner Código de Barras -->
+<button aria-label="Escanear Código de Barras" class="h-12 w-12 flex-shrink-0 bg-primary-container text-on-primary rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm" type="button">
+<span class="material-symbols-outlined text-[24px]">barcode_scanner</span>
+</button>
+</div>
+<!-- Chips Deslizables de Categorías -->
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-space-md px-space-md no-scrollbar">
+<button class="flex-shrink-0 px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center gap-1 shadow-sm" type="button">
+<span>Todos</span>
+<span class="bg-primary-fixed/20 text-primary-fixed text-[10px] px-1.5 py-0.2 rounded-full">48</span>
+</button>
+<button class="flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors shadow-sm" type="button">
+        Camisas
+      </button>
+<button class="flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors shadow-sm" type="button">
+        Pantalones
+      </button>
+<button class="flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors shadow-sm" type="button">
+        Playeras
+      </button>
+<button class="flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors shadow-sm" type="button">
+        Cinturones
+      </button>
+<button class="flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors shadow-sm" type="button">
+        Lociones / Perfumería
+      </button>
+<button class="flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-md text-label-md hover:bg-surface-container transition-colors shadow-sm flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">local_fire_department</span>
+<span>En Oferta</span>
+</button>
+</div>
+<!-- Filtros de Talla & Disponibilidad -->
+<div class="flex items-center justify-between gap-2 overflow-x-auto pt-0.5">
+<div class="flex items-center gap-1 flex-shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant pr-1">Talla:</span>
+<button class="h-7 px-2.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm active:bg-primary active:text-on-primary" type="button">S</button>
+<button class="h-7 px-2.5 rounded bg-primary text-on-primary font-label-sm text-label-sm font-bold" type="button">M</button>
+<button class="h-7 px-2.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm active:bg-primary active:text-on-primary" type="button">L</button>
+<button class="h-7 px-2.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm active:bg-primary active:text-on-primary" type="button">30</button>
+<button class="h-7 px-2.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm active:bg-primary active:text-on-primary" type="button">32</button>
+<button class="h-7 px-2.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm active:bg-primary active:text-on-primary" type="button">34</button>
+</div>
+<div class="flex items-center gap-1.5 flex-shrink-0 pl-2">
+<label class="inline-flex items-center gap-1.5 cursor-pointer bg-secondary-container/30 px-2 py-1 rounded">
+<input checked="" class="accent-secondary w-3.5 h-3.5" type="checkbox"/>
+<span class="font-label-sm text-label-sm text-on-secondary-container font-semibold">Disponibles</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Catálogo Rápido con Datos Clave de Negociación Mostrador -->
+<div class="px-space-md py-2 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant font-bold uppercase tracking-wide">Prendas en Sala (4)</span>
+<span class="font-label-sm text-label-sm text-outline">Toque para añadir a venta</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+<!-- Producto 1: Camisa Oxford Celeste -->
+<div class="bg-surface-container-lowest rounded-xl p-3 shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="flex gap-3">
+<div class="relative w-16 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Classic light blue men long sleeve Oxford button-up shirt neatly pressed on a warm wooden retail hanger, crisp fabric weave, studio soft natural daylight lighting in a menswear boutique" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp9oiDtWJXZyjr3ESEN4NWC8K9C9HCjnvyUrIioJhvFjkTbBu-M_tgMOYYRp88yN5Dqi7tvZVIdESYSyCd1svMIzfny1-qAEgXWH5zlRTVydHSsrZvGcIou1n2zuRNwP7NyZrBhEYOz1p_9GXGmZIsMHUUQlXFsxgEJZpCbaQQGBOkFNyKj5A-KyKy2pKYTiEt5dOT9qsOW59cbYk6unOpv7Uww57_WqfizH0vsL_HRflG3Bl_lXaFDA"/>
+<span class="absolute bottom-0 inset-x-0 bg-primary/80 backdrop-blur-xs text-on-primary text-[10px] text-center font-bold py-0.5">Tallas M, L</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="font-title-md text-title-md text-primary font-bold truncate">Camisa Oxford Celeste</h3>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-[10px] font-bold flex-shrink-0">
+                8 disp.
+              </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Manga larga entallada • 100% Algodón</p>
+<!-- Precios de mostrador y margen de regateo -->
+<div class="mt-2 flex items-baseline justify-between bg-surface-container-low px-2 py-1 rounded">
+<div>
+<span class="font-label-sm text-[10px] text-on-surface-variant block leading-none">P. Venta</span>
+<span class="font-title-md text-title-md text-primary font-bold">Q 185.00</span>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-[10px] text-on-tertiary-container font-semibold block leading-none">P. Mínimo</span>
+<span class="font-label-md text-label-md text-tertiary-container font-bold">Q 160.00</span>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-2.5 w-full h-9 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:bg-on-secondary-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+<span>+ Agregar a Ticket</span>
+</button>
+</div>
+<!-- Producto 2: Pantalón Gabardina Khaki (Stock Bajo) -->
+<div class="bg-surface-container-lowest rounded-xl p-3 shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="flex gap-3">
+<div class="relative w-16 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Mens tailored khaki gabardine casual trousers neatly folded showing refined texture and belt loops, warm mercantile setting with subtle neutral tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlQ4wtMlVxB_UZ2TFTGOXhjHNEITIfxx6d1jpIRdOOscRbr7xJoXsYY2l_y_blXDBrM2Q4OFCUKMlospAXd13K5neDPR06-ssu2Re9m_fEQaLi5X25LXWTCnzgJFUhe8IDV-6e70pJJhyy_kX2zKB1DnKR3gW-sqMpaAHYtFybcEn56u4JYhhL-7aSFOSReJjo1j6QC12_HzFWTv_JYUTQOGNYaUl9h2TeChXY_M5ZhLdim2WPKN98QQ"/>
+<span class="absolute bottom-0 inset-x-0 bg-primary/80 backdrop-blur-xs text-on-primary text-[10px] text-center font-bold py-0.5">Talla 32</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="font-title-md text-title-md text-primary font-bold truncate">Pantalón Gabardina Khaki</h3>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-[10px] font-bold flex-shrink-0 animate-pulse">
+                3 disp.
+              </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Corte recto formal • Gabardina pesada</p>
+<div class="mt-2 flex items-baseline justify-between bg-surface-container-low px-2 py-1 rounded">
+<div>
+<span class="font-label-sm text-[10px] text-on-surface-variant block leading-none">P. Venta</span>
+<span class="font-title-md text-title-md text-primary font-bold">Q 220.00</span>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-[10px] text-on-tertiary-container font-semibold block leading-none">P. Mínimo</span>
+<span class="font-label-md text-label-md text-tertiary-container font-bold">Q 190.00</span>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-2.5 w-full h-9 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:bg-on-secondary-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+<span>+ Agregar a Ticket</span>
+</button>
+</div>
+<!-- Producto 3: Playera Polo Piqué -->
+<div class="bg-surface-container-lowest rounded-xl p-3 shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="flex gap-3">
+<div class="relative w-16 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Classic navy blue pique polo shirt with collar and two pearl buttons folded neatly on clean commercial boutique tabletop, soft ambient daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4rdjOlHXIV9g87ULKNHcLqu1qO9VdGDIK0zCicyljzbMcx8yzcZQckkt9Rs2RlUdmQAHO6_2mwEE7K2RXrWhIp5r4o_V5QSnOfrKldCSRr83fdFtPYYuuklt9_zzV8ukgaKnkEgKYyU-WuVM9bN_YLHWz-q4zVTdUWQ3joTvDWKCaT0Nd7RvMtwrEwN0rZdx8vkKE9yv18LjCFrpzghLHxBDtUmtsQzYddeQREjqVV4wFZUw0YDMbjg"/>
+<span class="absolute bottom-0 inset-x-0 bg-primary/80 backdrop-blur-xs text-on-primary text-[10px] text-center font-bold py-0.5">Talla L</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="font-title-md text-title-md text-primary font-bold truncate">Playera Polo Piqué Azul</h3>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-[10px] font-bold flex-shrink-0">
+                12 disp.
+              </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Algodón peinado piqué • Confortable</p>
+<div class="mt-2 flex items-baseline justify-between bg-surface-container-low px-2 py-1 rounded">
+<div>
+<span class="font-label-sm text-[10px] text-on-surface-variant block leading-none">P. Venta</span>
+<span class="font-title-md text-title-md text-primary font-bold">Q 95.00</span>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-[10px] text-on-tertiary-container font-semibold block leading-none">P. Mínimo</span>
+<span class="font-label-md text-label-md text-tertiary-container font-bold">Q 80.00</span>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-2.5 w-full h-9 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:bg-on-secondary-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+<span>+ Agregar a Ticket</span>
+</button>
+</div>
+<!-- Producto 4: Loción Clásica Caballero -->
+<div class="bg-surface-container-lowest rounded-xl p-3 shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="flex gap-3">
+<div class="relative w-16 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Elegant amber glass men cologne bottle 100ml with vintage metallic cap sitting on dark wood surface, warm commercial illumination" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6xKi6TcYZ2TDhCBg01Q3PsvuW3b1YPQvQWAiz2irGceDJZidgMsU766rUhlo9OyIOFTEjqWROlxg9f5HAORa6C5SMwspiL2qsmtMpHXiWlqnz4jadw5uubsZ-y33JJj4Chqk2qsRT0XIkSL5674cHjVZKEZEvGvsKIo2Z2_HuI2VlPOrvM-xrX5WPscUh1YUW4wX4SSbXxxeVa-DGfC0UIkdAkFStNr5Hd97uEqUYm80FxYvxnnieyg"/>
+<span class="absolute bottom-0 inset-x-0 bg-primary/80 backdrop-blur-xs text-on-primary text-[10px] text-center font-bold py-0.5">100 ml</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-start justify-between gap-1">
+<h3 class="font-title-md text-title-md text-primary font-bold truncate">Loción Clásica Caballero</h3>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-[10px] font-bold flex-shrink-0">
+                5 disp.
+              </span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Aroma amaderado intenso • Original</p>
+<div class="mt-2 flex items-baseline justify-between bg-surface-container-low px-2 py-1 rounded">
+<div>
+<span class="font-label-sm text-[10px] text-on-surface-variant block leading-none">P. Venta</span>
+<span class="font-title-md text-title-md text-primary font-bold">Q 160.00</span>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-[10px] text-on-tertiary-container font-semibold block leading-none">P. Mínimo</span>
+<span class="font-label-md text-label-md text-tertiary-container font-bold">Q 140.00</span>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-2.5 w-full h-9 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:bg-on-secondary-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+<span>+ Agregar a Ticket</span>
+</button>
+</div>
+</div>
+</div>
+<!-- SECCIÓN TICKET DE VENTA EN VIVO (Carrito mostrador interactivo) -->
+<div class="px-space-md pt-3 pb-2 flex flex-col gap-3">
+<div class="flex items-center justify-between bg-primary text-on-primary px-3 py-2 rounded-xl shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-secondary-fixed">receipt</span>
+<span class="font-title-md text-title-md font-bold">Ticket de Venta</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-lowest text-primary font-label-sm text-label-sm font-bold">2 prendas</span>
+</div>
+<button class="text-error-container text-xs font-semibold hover:underline flex items-center gap-0.5" type="button">
+<span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+<span>Limpiar</span>
+</button>
+</div>
+<!-- Items en Carrito -->
+<div class="flex flex-col gap-2">
+<!-- Ítem 1: Camisa Oxford Celeste (Negociada) -->
+<div class="bg-surface-container-lowest rounded-xl p-3 shadow-sm flex flex-col gap-2">
+<div class="flex items-start justify-between">
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-1.5">
+<span class="font-title-md text-title-md text-primary font-bold truncate">Camisa Oxford Celeste</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded text-[11px] font-bold text-on-surface-variant">Talla M</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="text-xs text-outline line-through">Lista: Q 185.00</span>
+<span class="text-xs font-bold text-secondary">Negociado: Q 170.00</span>
+</div>
+</div>
+<!-- Stepper de Cantidad Ergonómico -->
+<div class="flex items-center bg-surface-container-low rounded-lg p-0.5 flex-shrink-0">
+<button aria-label="Disminuir" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-surface-container rounded active:scale-95 font-bold" type="button">-</button>
+<span class="w-7 text-center font-title-md text-title-md font-bold text-primary">1</span>
+<button aria-label="Aumentar" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-surface-container rounded active:scale-95 font-bold" type="button">+</button>
+</div>
+</div>
+<!-- Tag de margen de regateo advertencia amigable -->
+<div class="flex items-center justify-between bg-surface-container-high px-2 py-1 rounded">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-on-tertiary-container">info</span>
+<span class="font-label-sm text-label-sm text-on-surface">Cerca del precio mínimo (Q 160.00)</span>
+</div>
+<span class="font-label-sm text-label-sm font-bold text-primary">Subtotal: Q 170.00</span>
+</div>
+</div>
+<!-- Ítem 2: Cinturón Cuero Genuino Café -->
+<div class="bg-surface-container-lowest rounded-xl p-3 shadow-sm flex flex-col gap-2">
+<div class="flex items-start justify-between">
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-1.5">
+<span class="font-title-md text-title-md text-primary font-bold truncate">Cinturón Cuero Café</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded text-[11px] font-bold text-on-surface-variant">Talla 34</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="text-xs font-semibold text-on-surface-variant">Precio fijado: Q 110.00</span>
+</div>
+</div>
+<!-- Stepper de Cantidad -->
+<div class="flex items-center bg-surface-container-low rounded-lg p-0.5 flex-shrink-0">
+<button aria-label="Disminuir" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-surface-container rounded active:scale-95 font-bold" type="button">-</button>
+<span class="w-7 text-center font-title-md text-title-md font-bold text-primary">1</span>
+<button aria-label="Aumentar" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-surface-container rounded active:scale-95 font-bold" type="button">+</button>
+</div>
+</div>
+<div class="flex items-center justify-end px-2 py-0.5">
+<span class="font-label-sm text-label-sm font-bold text-primary">Subtotal: Q 110.00</span>
+</div>
+</div>
+<!-- ALERTA DEMOSTRATIVA DE BLOQUEO DE PRECIO (REGLA DE NEGOCIO GUATEMALA) -->
+<div class="bg-tertiary-fixed/30 rounded-xl p-3 shadow-sm flex flex-col gap-2">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[22px] text-tertiary-container flex-shrink-0">warning</span>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-tertiary-container font-bold">Bloqueo de Descuento Extremo</span>
+<span class="font-label-sm text-[10px] bg-tertiary-container text-on-tertiary px-1.5 py-0.2 rounded font-semibold">Q 140.00 digitado</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface mt-0.5 leading-snug">
+              Precio inferior al mínimo permitido (Q 160.00). Requiere PIN de autorización del dueño (<strong>Don Pedro</strong>).
+            </p>
+</div>
+</div>
+<div class="flex items-center justify-end gap-2 pt-1">
+<button class="px-2.5 py-1.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-semibold" type="button">
+            Revertir a Q 160.00
+          </button>
+<button class="px-3 py-1.5 rounded bg-tertiary-container text-on-tertiary font-label-sm text-label-sm font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[16px]">key</span>
+<span>Pedir PIN de Autorización</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- MÉTODOS DE PAGO Y COBRO TÁCTIL RÁPIDO -->
+<div class="px-space-md pt-2 pb-4 flex flex-col gap-3">
+<span class="font-label-md text-label-md text-on-surface-variant font-bold uppercase tracking-wide">Forma de Liquidación</span>
+<!-- Selector de Métodos de Pago Grandes -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+<!-- Efectivo (Activo) -->
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-primary text-on-primary shadow-sm active:scale-95 transition-transform relative" type="button">
+<span class="material-symbols-outlined text-[24px] text-secondary-fixed">payments</span>
+<span class="font-title-md text-title-md font-bold mt-1">Efectivo</span>
+<span class="font-label-sm text-[11px] text-on-primary-container">Billetes GT</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary-fixed"></span>
+</button>
+<!-- Transferencia -->
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">account_balance</span>
+<span class="font-title-md text-title-md font-bold mt-1">Transferencia</span>
+<span class="font-label-sm text-[11px] text-outline">BI / Banrural / G&amp;T</span>
+</button>
+<!-- QR / Tarjeta -->
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">credit_card</span>
+<span class="font-title-md text-title-md font-bold mt-1">Tarjeta / QR</span>
+<span class="font-label-sm text-[11px] text-outline">POS Neonet / Visanet</span>
+</button>
+<!-- Crédito Fiar -->
+<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[24px] text-on-surface-variant">menu_book</span>
+<span class="font-title-md text-title-md font-bold mt-1">Crédito / Fiar</span>
+<span class="font-label-sm text-[11px] text-outline">Libreta de Clientes</span>
+</button>
+</div>
+<!-- Calculadora de Cambio y Resumen -->
+<div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex flex-col gap-3">
+<div class="flex flex-col gap-1.5 pb-2">
+<div class="flex items-center justify-between text-on-surface-variant font-body-md text-body-md">
+<span>Subtotal lista:</span>
+<span class="font-semibold text-primary">Q 295.00</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-md text-body-md">
+<span class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[16px]">loyalty</span>
+<span>Descuento de mostrador aplicado:</span>
+</span>
+<span class="font-bold text-secondary">- Q 30.00</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-title-lg text-title-lg font-bold text-primary">Total a Cobrar:</span>
+<span class="font-display-lg-mobile text-display-lg-mobile font-bold text-primary">Q 265.00</span>
+</div>
+</div>
+<!-- Calculadora de Vuelto Rápida Táctil -->
+<div class="bg-surface-container-low rounded-xl p-3 flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-bold uppercase">Cálculo de Vuelto Inmediato</span>
+<span class="font-label-sm text-[11px] text-outline">Toque para cambiar</span>
+</div>
+<div class="grid grid-cols-2 gap-2 items-center">
+<div class="bg-surface-container-lowest rounded-lg p-2 flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant">Efectivo Recibido</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="text-sm font-bold text-secondary">Q</span>
+<span class="font-title-lg text-title-lg font-bold text-primary">300.00</span>
+</div>
+</div>
+<!-- VUELTO DESTACADO -->
+<div class="bg-secondary-container/40 rounded-lg p-2 flex flex-col">
+<span class="font-label-sm text-[10px] text-on-secondary-container font-bold">Vuelto / Cambio a Entregar</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="text-sm font-bold text-secondary">Q</span>
+<span class="font-headline-sm text-headline-sm font-bold text-secondary">35.00</span>
+</div>
+</div>
+</div>
+<!-- Botones de denominación rápida común en Guatemala -->
+<div class="flex items-center gap-1.5 pt-1 overflow-x-auto no-scrollbar">
+<span class="font-label-sm text-[10px] text-outline flex-shrink-0">Billetes exactos:</span>
+<button class="h-6 px-2 rounded bg-surface-container-highest text-on-surface font-label-sm text-[11px] font-bold" type="button">Q 265 Exacto</button>
+<button class="h-6 px-2 rounded bg-surface-container-highest text-on-surface font-label-sm text-[11px] font-bold" type="button">Q 300</button>
+<button class="h-6 px-2 rounded bg-surface-container-highest text-on-surface font-label-sm text-[11px] font-bold" type="button">Q 400</button>
+<button class="h-6 px-2 rounded bg-surface-container-highest text-on-surface font-label-sm text-[11px] font-bold" type="button">Q 500</button>
+</div>
+</div>
+<!-- BOTÓN PRINCIPAL DE COBRO TÁCTIL (MOMENTO DE DELICIA) -->
+<button class="w-full h-14 bg-secondary text-on-secondary rounded-xl font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-on-secondary-container active:scale-[0.98] transition-all relative overflow-hidden" id="btn-confirmar-venta" type="button">
+<span class="material-symbols-outlined text-[24px]">point_of_sale</span>
+<span>CONFIRMAR VENTA (Q 265.00)</span>
+</button>
+<!-- Opciones complementarias rápidas -->
+<div class="flex items-center justify-between text-xs text-on-surface-variant pt-1 px-1">
+<label class="flex items-center gap-1.5 cursor-pointer">
+<input checked="" class="accent-secondary w-3.5 h-3.5" type="checkbox"/>
+<span class="font-label-sm text-label-sm">Imprimir ticket físico</span>
+</label>
+<button class="font-label-sm text-label-sm font-bold text-secondary hover:underline flex items-center gap-0.5" type="button">
+<span class="material-symbols-outlined text-[14px]">send_to_mobile</span>
+<span>Enviar por WhatsApp</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Toast / Modal de confirmación micro-interacción -->
+<div class="hidden fixed bottom-20 inset-x-4 z-50 bg-primary text-on-primary p-4 rounded-xl shadow-2xl flex items-center justify-between" id="pos-feedback-toast">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md font-bold">¡Venta Q 265.00 Registrada!</h4>
+<p class="font-label-sm text-label-sm text-on-primary-container">Guardada localmente &amp; inventario actualizado.</p>
+</div>
+</div>
+<button class="text-on-primary-container hover:text-on-primary p-1" onclick="document.getElementById('pos-feedback-toast').classList.add('hidden')" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+</div>
+<script>
+  // Micro-interacción de confirmación rápida de cobro en terminal
+  document.addEventListener('DOMContentLoaded', function() {
+    const btnConfirmar = document.getElementById('btn-confirmar-venta');
+    const toast = document.getElementById('pos-feedback-toast');
+
+    if (btnConfirmar && toast) {
+      btnConfirmar.addEventListener('click', function() {
+        toast.classList.remove('hidden');
+        // Feedback háptico si estuviese disponible en dispositivo físico
+        if (navigator.vibrate) {
+          navigator.vibrate([40, 60, 40]);
+        }
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 3500);
+      });
+    }
+  });
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(15,41,66,0.06)]" data-active-classes="text-secondary font-bold"><div class="flex items-center justify-around h-16 px-space-xs"><a class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="inicio" href="#"><span class="material-symbols-outlined text-[22px]">storefront</span><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Inicio</span></a><a aria-current="page" class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 transition-colors relative text-secondary font-bold" data-path="vender" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">shopping_bag</span><span class="absolute -top-1 -right-2 px-1 py-0.2 rounded-full bg-secondary text-on-secondary font-label-sm text-[9px] font-bold leading-none">POS</span></div><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Vender</span></a><a class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="inventario" href="#"><span class="material-symbols-outlined text-[22px]">inventory_2</span><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Inventario</span></a><a class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="operaciones" href="#"><span class="material-symbols-outlined text-[22px]">receipt_long</span><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Operaciones</span></a><a class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="mas" href="#"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Más</span></a></div></nav></body></html>

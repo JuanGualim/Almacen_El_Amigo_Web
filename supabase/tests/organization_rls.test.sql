@@ -48,6 +48,8 @@ create temporary table test_context (
   second_business_id uuid
 );
 
+grant select, insert, update on test_context to authenticated;
+
 set local role authenticated;
 select set_config('request.jwt.claim.role', 'authenticated', true);
 select set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', true);
@@ -84,8 +86,8 @@ select ok(
 
 select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', true);
 
-insert into test_context (second_business_id)
-select public.create_business('Negocio Dos de Prueba');
+update test_context
+set second_business_id = public.create_business('Negocio Dos de Prueba');
 
 select is(
   (select count(*) from public.businesses),

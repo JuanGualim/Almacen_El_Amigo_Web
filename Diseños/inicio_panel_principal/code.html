@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#f7f9fb;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-container": "#7991af", "on-secondary-fixed": "#002115", "primary": "#001428", "on-background": "#191c1e", "background": "#f7f9fb", "on-tertiary-fixed-variant": "#6e3900", "on-tertiary-fixed": "#2f1500", "secondary-fixed": "#89f7c9", "surface-container-low": "#f2f4f6", "on-tertiary-container": "#d77503", "surface-variant": "#e0e3e5", "surface-dim": "#d8dadc", "surface-container-lowest": "#ffffff", "tertiary": "#220e00", "inverse-surface": "#2d3133", "on-primary-fixed-variant": "#314863", "surface-container-highest": "#e0e3e5", "on-tertiary": "#ffffff", "primary-fixed": "#d1e4ff", "on-surface-variant": "#43474d", "on-primary": "#ffffff", "outline-variant": "#c3c6ce", "surface-bright": "#f7f9fb", "tertiary-fixed-dim": "#ffb77d", "secondary-container": "#86f5c6", "surface-container": "#eceef0", "inverse-primary": "#b0c9e8", "on-secondary-fixed-variant": "#00513a", "surface-tint": "#49607c", "tertiary-fixed": "#ffdcc3", "outline": "#74777e", "surface": "#f7f9fb", "error-container": "#ffdad6", "surface-container-high": "#e6e8ea", "primary-container": "#0f2942", "on-error": "#ffffff", "secondary": "#006c4e", "on-secondary": "#ffffff", "primary-fixed-dim": "#b0c9e8", "on-secondary-container": "#007151", "on-primary-fixed": "#011d35", "error": "#ba1a1a", "tertiary-container": "#401f00", "secondary-fixed-dim": "#6cdbae", "on-error-container": "#93000a", "inverse-on-surface": "#eff1f3", "on-surface": "#191c1e" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, spacing: { "space-xs": "0.25rem", "margin": "1rem", "gutter": "1rem", "margin-tablet": "1.5rem", "space-xl": "2rem", "space-sm": "0.5rem", "space-md": "1rem", "margin-desktop": "2rem", "gutter-desktop": "1.5rem", "space-lg": "1.5rem", "gutter-tablet": "1.25rem" }, fontFamily: { "headline-lg": ["Plus Jakarta Sans"], "numeric-pos": ["Plus Jakarta Sans"], "body-md": ["Inter"], "headline-lg-mobile": ["Plus Jakarta Sans"], "label-sm": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "label-lg": ["Inter"], "title-md": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "title-lg": ["Inter"], "display-lg": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "display-lg-mobile": ["Plus Jakarta Sans"], "body-lg": ["Inter"] }, fontSize: { "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "numeric-pos": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }], "title-md": ["16px", { "lineHeight": "22px", "fontWeight": "600" }], "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }], "title-lg": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "display-lg-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen antialiased"><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-20 px-space-md flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0 flex-1"><img alt="Logo Almacén El Amigo" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1UlmmAFGClON6I9bwLajiLY8fUPZLvZegrlhzuvSkozJx3m3-FKE1uu_77T088ZWY3SND-YYxMiLshrARhSlX8hKCiCtK0LB15CdBhN-EfHAXjI13FBbqB3Q7xrYjtJO-oDoWgzNejZ3JnSqFxKHO2V0l2wYbq4HaGtz00Z-Golj6c7kWJ0ifq1SBs5PCxbXoUec8umrJ2TeAnHcLJado1dXDS3KQsUh46q0qDYO0gH7Emf4OqzaZP6sGfj"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-1"><button class="flex items-center gap-1 text-left group min-w-0 max-w-[170px]" type="button"><span class="font-title-md text-title-md text-primary font-bold truncate group-hover:text-secondary transition-colors">Almacén El Amigo</span><span class="material-symbols-outlined text-[18px] text-on-surface-variant flex-shrink-0">arrow_drop_down</span></button></div><div class="flex items-center gap-space-xs"><span class="font-label-sm text-label-sm text-on-surface-variant truncate">Sucursal Central</span><span class="text-outline-variant text-[10px]">•</span><div class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container"><span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span><span class="font-label-sm text-[10px] leading-tight font-semibold">En línea</span></div></div></div></div><div class="flex items-center gap-1 flex-shrink-0"><button aria-label="Notificaciones" class="relative w-11 h-11 flex items-center justify-center rounded-xl text-on-surface-variant hover:bg-surface-container active:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><div class="flex items-center justify-center p-0.5"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVwzWkD9ktYcLcRw4D55SX5EjTv4lXa9R_QHf-ovE7STjs704ZiSUsPrTRJ4thKVtY6PW5YWUchVnC0Dlv0r3Q9Zi-oc_bAnwID85Q-KFRhCb-O07UpN3jjnaDtDHSaDrEvQg3Zb5Wz_fNbcaLm0gf-LWUfG4MfLDzknKSF6qtMRh2wgYECSUQYO2uK4hHkKXYNPOE8jbLZl1w83mdedor44shRhO7AuFVyScDpqok6bwkL5ty16LVIA"/></div></div></div></header><main class="flex flex-col relative w-full pt-20 pb-24 bg-surface flex-1 min-h-0"><div class="flex flex-col w-full">
+<!-- PWA Dynamic Sync Status Banner -->
+<aside class="w-full bg-secondary text-on-secondary px-space-md py-2 flex items-center justify-between shadow-sm cursor-pointer transition-colors duration-300" id="network-banner">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" id="network-icon">wifi</span>
+<span class="font-label-sm text-label-sm font-semibold" id="network-text">🟢 Conectado y sincronizado</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-lowest/15 px-2 py-0.5 rounded-full">
+<span class="font-label-sm text-[10px] uppercase tracking-wider opacity-90">Tocar para simular</span>
+<span class="material-symbols-outlined text-[14px]">swap_horiz</span>
+</div>
+</aside>
+<!-- Main Scrollable Dashboard Content -->
+<div class="flex flex-col px-space-md py-space-md gap-space-md w-full">
+<!-- Greeting & Store Identity Block -->
+<section class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-bold">Admin</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Turno Matutino</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mt-1 font-bold">¡Buenos días, Don Pedro!</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5 truncate">
+<span class="material-symbols-outlined text-[16px] text-secondary">store</span>
+            Sucursal Central • 6a Avenida, Zona 1
+          </p>
+</div>
+<div class="flex-shrink-0">
+<button aria-label="Ajustes de terminal" class="w-11 h-11 rounded-xl bg-surface-container flex items-center justify-center text-primary active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+</div>
+<!-- Live Register Strip -->
+<div class="mt-1 p-space-sm bg-secondary-container/30 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-secondary-container font-bold">Caja Abierta • Terminal #01</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">Fondo inicial: <strong class="font-semibold text-primary">Q 800.00</strong></span>
+</div>
+</div>
+<button class="px-2.5 py-1 bg-surface-container-lowest text-secondary rounded-lg font-label-sm text-label-sm font-bold shadow-sm active:scale-95 transition-transform flex items-center gap-1" type="button">
+<span>Ver Arqueo</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Financial Performance Card with Confidentiality Mode -->
+<section class="bg-primary text-on-primary p-space-md rounded-xl shadow-md relative overflow-hidden flex flex-col gap-space-md">
+<!-- Decorative Backdrop Graphic -->
+<div class="absolute -right-6 -bottom-6 w-36 h-36 bg-secondary/15 rounded-full pointer-events-none blur-2xl"></div>
+<!-- Card Header + Privacy Switch -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed text-[20px]">query_stats</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-inverse-primary font-bold">Ventas de Hoy</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest/15 text-on-primary active:bg-surface-container-lowest/25 transition-all text-left" id="toggle-privacy-btn" type="button">
+<span class="material-symbols-outlined text-[16px]" id="privacy-icon">visibility</span>
+<span class="font-label-sm text-label-sm font-bold" id="privacy-text">Modo Dueño: ON</span>
+</button>
+</div>
+<!-- Main Metric Display -->
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-inverse-primary font-medium">Ingresos brutos del día (18 tickets)</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-lg-mobile text-display-lg-mobile font-bold tracking-tight text-on-primary">Q 3,450.00</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">trending_up</span> +14%
+          </span>
+</div>
+</div>
+<!-- Breakdowns (Cash vs Digital) -->
+<div class="grid grid-cols-2 gap-space-sm pt-2">
+<div class="bg-surface-container-lowest/10 p-space-sm rounded-lg flex flex-col">
+<div class="flex items-center gap-1.5 text-inverse-primary">
+<span class="material-symbols-outlined text-[16px]">payments</span>
+<span class="font-label-sm text-label-sm">Efectivo en gaveta</span>
+</div>
+<span class="font-title-md text-title-md font-bold text-on-primary mt-0.5">Q 2,820.00</span>
+<span class="font-label-sm text-[10px] text-inverse-primary/80 mt-0.5">14 transacciones</span>
+</div>
+<div class="bg-surface-container-lowest/10 p-space-sm rounded-lg flex flex-col">
+<div class="flex items-center gap-1.5 text-secondary-fixed">
+<span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+<span class="font-label-sm text-label-sm">Transferencias / QR</span>
+</div>
+<span class="font-title-md text-title-md font-bold text-on-primary mt-0.5">Q 630.00</span>
+<span class="font-label-sm text-[10px] text-inverse-primary/80 mt-0.5">4 cobros digitales</span>
+</div>
+</div>
+<!-- Confidential Insights Block (Collapsible) -->
+<div class="bg-surface-container-lowest/15 p-space-sm rounded-lg flex flex-col gap-2 transition-all duration-300" id="confidential-metrics">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-inverse-primary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span> Margen Bruto Estimado:
+          </span>
+<span class="font-label-md text-label-md font-bold text-secondary-fixed">+34% (Q 1,180.00)</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-inverse-primary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">history_edu</span> Cuentas fiadas por cobrar:
+          </span>
+<span class="font-label-md text-label-md font-bold text-tertiary-fixed-dim">Q 420.00 (2 clientes)</span>
+</div>
+</div>
+</section>
+<!-- Quick Touch Actions (Big Mobile Ergonomics) -->
+<section class="flex flex-col gap-space-sm">
+<h2 class="font-title-md text-title-md text-primary font-bold px-1">Acciones Operativas</h2>
+<!-- Primary Big POS Action Button -->
+<button class="w-full min-h-[58px] bg-secondary text-on-secondary px-space-md py-3 rounded-xl shadow-md flex items-center justify-between active:bg-on-secondary-container transition-all group" type="button">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest/20 flex items-center justify-center text-on-secondary">
+<span class="material-symbols-outlined text-[24px]">point_of_sale</span>
+</div>
+<div class="flex flex-col text-left">
+<span class="font-title-lg text-title-lg font-bold leading-tight">Nueva Venta</span>
+<span class="font-label-sm text-label-sm opacity-90">Cobro rápido en caja o mostrador</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[26px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<!-- 3-Action Supporting Grid -->
+<div class="grid grid-cols-3 gap-space-sm">
+<!-- New Purchase / Inbound Stock -->
+<button class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-1 min-h-[88px] active:bg-surface-container transition-colors" type="button">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">local_shipping</span>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold mt-1">Nueva Compra</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-none">Ingreso mercadería</span>
+</button>
+<!-- Rapid Inventory Lookup -->
+<button class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-1 min-h-[88px] active:bg-surface-container transition-colors" type="button">
+<div class="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined text-[20px]">shelves</span>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold mt-1">Existencias</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-none">Buscador veloz</span>
+</button>
+<!-- Daily Register Reconciliation -->
+<button class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col items-center justify-center text-center gap-1 min-h-[88px] active:bg-surface-container transition-colors" type="button">
+<div class="w-9 h-9 rounded-lg bg-error-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[20px]">lock_clock</span>
+</div>
+<span class="font-label-md text-label-md text-error font-bold mt-1">Cuadrar Caja</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-none">Cierre de turno</span>
+</button>
+</div>
+</section>
+<!-- Visual Showcase / Featured In-Demand Stock Banner -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-sm flex items-center gap-space-sm overflow-hidden">
+<img class="w-20 h-20 rounded-lg object-cover flex-shrink-0" data-alt="Close up photograph of neatly stacked cotton and denim menswear including folded jeans and folded button up shirts in a warm retail shop setting, high quality fabric textures, authentic boutique merchandising." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6EvKIiuq1Th1iQHbN_3jdnUcsxgzRl82uQBg9sWLQVz4Uzs5dne8HGZR02Qnslj_ui-HredHhcyrSZOByu3CyvvMMhfN3ki6Dx7VhIPQI7tDehBvjk26BrFR_7NuevD01YI1CPNExyEXeQiPcsf9kEirujVP4nUIk0ZF8oXyhd9h5iAJh7jZenMLxI9xTVRrryapDdDRcWAtsdbqhElKIdC-X0j4YZiwoI1nEo2HB8jbe6_vO0Or0ow"/>
+<div class="flex flex-col min-w-0 justify-center">
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-bold uppercase tracking-wider">Temporada de Verano</span>
+<h3 class="font-title-md text-title-md text-primary font-bold truncate">Camisas Guayaberas y Jeans</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 line-clamp-2">Llegaron 35 unidades del distribuidor de Escuintla. Listos para etiquetar y exhibir.</p>
+</div>
+</section>
+<!-- Critical Store Alerts & Triage -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-1">
+<h2 class="font-title-md text-title-md text-primary font-bold flex items-center gap-2">
+<span>Alertas de Tienda</span>
+<span class="px-2 py-0.2 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-bold">11 pendientes</span>
+</h2>
+<a class="font-label-md text-label-md text-secondary font-bold" href="#">Gestionar</a>
+</div>
+<div class="flex flex-col gap-2">
+<!-- Stock Bajo Card -->
+<article class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 rounded-lg bg-surface-container-high text-on-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+</span>
+<span class="font-label-md text-label-md text-primary font-bold">Stock Bajo por Agotarse</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm font-bold">4 artículos</span>
+</div>
+<ul class="flex flex-col gap-1.5 pl-9 pr-1">
+<li class="flex items-center justify-between text-body-sm">
+<span class="font-body-sm text-on-surface truncate">Pantalón Jeans Slim Fit T32</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-bold flex-shrink-0">Quedan 2</span>
+</li>
+<li class="flex items-center justify-between text-body-sm">
+<span class="font-body-sm text-on-surface truncate">Cinturón Cuero Café Genuino</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-bold flex-shrink-0">Queda 1</span>
+</li>
+</ul>
+</article>
+<!-- Agotados Card -->
+<article class="bg-error-container/20 p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-7 h-7 rounded-lg bg-error-container text-error flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">remove_shopping_cart</span>
+</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-error font-bold">Agotado Total (2 productos)</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">Camisa Guayabera Lino Blanca T.M</span>
+</div>
+</div>
+<button class="px-3 py-1.5 bg-error text-on-error rounded-lg font-label-sm text-label-sm font-bold flex-shrink-0 active:scale-95 transition-transform" type="button">
+            Pedir
+          </button>
+</article>
+<!-- Costos y Precios Card -->
+<article class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-7 h-7 rounded-lg bg-surface-container-high text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">price_change</span>
+</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary font-bold">3 Precios por Revisar</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Subió costo en distribuidor textil</span>
+</div>
+</div>
+<button class="px-2.5 py-1 bg-surface-container text-primary rounded-lg font-label-sm text-label-sm font-bold flex-shrink-0 active:bg-surface-container-high" type="button">
+            Ajustar
+          </button>
+</article>
+<!-- Cuentas Fiadas / Créditos Pendientes -->
+<article class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-7 h-7 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[16px]">person_alert</span>
+</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary font-bold">Cobro de Abono Vencido</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Don Carlos Gómez (Q 250.00 ayer)</span>
+</div>
+</div>
+<button class="px-2.5 py-1 bg-primary text-on-primary rounded-lg font-label-sm text-label-sm font-bold flex-shrink-0 active:bg-primary-container" type="button">
+            Cobrar
+          </button>
+</article>
+</div>
+</section>
+<!-- Recent Sales Stream with Sync Badges -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-1">
+<h2 class="font-title-md text-title-md text-primary font-bold">Últimas Ventas</h2>
+<a class="font-label-md text-label-md text-secondary font-bold" href="#">Ver Todas</a>
+</div>
+<div class="flex flex-col gap-2">
+<!-- Sale Item 1 -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-2">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-lg bg-secondary-container/40 text-on-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-primary font-bold">Ticket #1042</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">10:42 AM</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Camisa Oxford Azul + Faja Cuero</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-label-sm text-[10px] text-secondary font-bold uppercase">Efectivo</span>
+<span class="text-outline-variant text-[8px]">•</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Sincronizado</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-title-md text-title-md text-primary font-bold">Q 320.00</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">cloud_done</span>
+</div>
+</div>
+<!-- Sale Item 2 -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-2">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed text-on-primary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">qr_code</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-primary font-bold">Ticket #1041</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">10:15 AM</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Loción Barba Club Man Clásica</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-label-sm text-[10px] text-primary font-bold uppercase">Transferencia QR</span>
+<span class="text-outline-variant text-[8px]">•</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Sincronizado</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-title-md text-title-md text-primary font-bold">Q 180.00</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">cloud_done</span>
+</div>
+</div>
+<!-- Sale Item 3 (Pending Sync demo) -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-2">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high text-on-tertiary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-primary font-bold">Ticket #1040</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">09:50 AM</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">2x Playeras Cuello V Algodón</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-label-sm text-[10px] text-on-tertiary-container font-bold uppercase">Pendiente sincronizar</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-title-md text-title-md text-primary font-bold">Q 150.00</span>
+<span class="material-symbols-outlined text-on-tertiary-container text-[16px] animate-spin">sync</span>
+</div>
+</div>
+<!-- Sale Item 4 -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-2">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-lg bg-secondary-container/40 text-on-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-primary font-bold">Ticket #1039</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant">09:22 AM</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Billetera de Cuero Genuino Negra</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="font-label-sm text-[10px] text-secondary font-bold uppercase">Efectivo</span>
+<span class="text-outline-variant text-[8px]">•</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">Sincronizado</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="font-title-md text-title-md text-primary font-bold">Q 95.00</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">cloud_done</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Operational PWA Health & System Diagnostic Footer -->
+<div class="bg-surface-container-low p-space-sm rounded-xl flex items-center justify-between text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-secondary">database</span>
+<span class="font-label-sm text-label-sm">Memoria local: <strong class="text-primary font-semibold">98% libre</strong></span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm">Sincronizado: hace 2 min</span>
+</div>
+</div>
+<!-- Empty safe clearance for sticky bottom navigation -->
+<div class="h-8 w-full"></div>
+</div>
+</div>
+<script>
+  // Client-Side Micro-Interactions for Almacén El Amigo PWA Dashboard
+
+  // 1. Interactive Owner Privacy Mode (Toggle confidential financial metrics)
+  const privacyBtn = document.getElementById('toggle-privacy-btn');
+  const privacyIcon = document.getElementById('privacy-icon');
+  const privacyText = document.getElementById('privacy-text');
+  const confidentialBlock = document.getElementById('confidential-metrics');
+  let isPrivate = false;
+
+  privacyBtn.addEventListener('click', () => {
+    isPrivate = !isPrivate;
+    if (isPrivate) {
+      privacyIcon.textContent = 'visibility_off';
+      privacyText.textContent = 'Modo Cajero (Cifras Ocultas)';
+      confidentialBlock.classList.add('opacity-0', 'h-0', 'py-0', 'overflow-hidden');
+      confidentialBlock.classList.remove('p-space-sm');
+    } else {
+      privacyIcon.textContent = 'visibility';
+      privacyText.textContent = 'Modo Dueño: ON';
+      confidentialBlock.classList.remove('opacity-0', 'h-0', 'py-0', 'overflow-hidden');
+      confidentialBlock.classList.add('p-space-sm');
+    }
+  });
+
+  // 2. Interactive Network State Simulator (Tap top banner to cycle network status)
+  const netBanner = document.getElementById('network-banner');
+  const netIcon = document.getElementById('network-icon');
+  const netText = document.getElementById('network-text');
+
+  const states = [
+    { text: '🟢 Conectado y sincronizado', icon: 'wifi', bg: 'bg-secondary', fg: 'text-on-secondary' },
+    { text: '🟡 3 ventas pendientes de sincronizar', icon: 'sync', bg: 'bg-primary', fg: 'text-on-primary' },
+    { text: '🔴 Modo sin conexión - Datos guardados en PWA', icon: 'wifi_off', bg: 'bg-error', fg: 'text-on-error' }
+  ];
+  let currentStateIdx = 0;
+
+  netBanner.addEventListener('click', () => {
+    currentStateIdx = (currentStateIdx + 1) % states.length;
+    const nextState = states[currentStateIdx];
+
+    // Reset background styles cleanly
+    netBanner.classList.remove('bg-secondary', 'bg-primary', 'bg-error', 'text-on-secondary', 'text-on-primary', 'text-on-error');
+    netBanner.classList.add(nextState.bg, nextState.fg);
+
+    netText.textContent = nextState.text;
+    netIcon.textContent = nextState.icon;
+  });
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(15,41,66,0.06)]" data-active-classes="text-secondary font-bold"><div class="flex items-center justify-around h-16 px-space-xs"><a aria-current="page" class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 transition-colors text-secondary font-bold" data-path="inicio" href="#"><span class="material-symbols-outlined text-[22px]">storefront</span><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Inicio</span></a><a class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 text-on-surface-variant hover:text-on-surface transition-colors relative" data-path="vender" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">shopping_bag</span><span class="absolute -top-1 -right-2 px-1 py-0.2 rounded-full bg-secondary text-on-secondary font-label-sm text-[9px] font-bold leading-none">POS</span></div><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Vender</span></a><a class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="inventario" href="#"><span class="material-symbols-outlined text-[22px]">inventory_2</span><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Inventario</span></a><a class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="operaciones" href="#"><span class="material-symbols-outlined text-[22px]">receipt_long</span><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Operaciones</span></a><a class="flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="mas" href="#"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="font-label-sm text-label-sm mt-0.5 tracking-tight">Más</span></a></div></nav></body></html>
