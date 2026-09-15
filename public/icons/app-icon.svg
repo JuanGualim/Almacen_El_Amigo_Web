@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Almacén El Amigo</title>
+  <rect width="128" height="128" rx="24" fill="#0f2942"/>
+  <path d="M30 53 64 27l34 26v45a8 8 0 0 1-8 8H38a8 8 0 0 1-8-8V53Z" fill="#001428" stroke="#b0c9e8" stroke-width="4"/>
+  <path d="M64 42v45M48 67l16-16 16 16" fill="none" stroke="#86f5c6" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+</svg>

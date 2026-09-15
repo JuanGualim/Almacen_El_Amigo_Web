@@ -1,0 +1,20 @@
+:root {
+  color: #191c1e;
+  background: #f7f9fb;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --color-primary: #0f2942;
+  --color-primary-dark: #001428;
+  --color-secondary: #008f68;
+  --color-secondary-dark: #007151;
+  --color-warning: #b75f00;
+  --color-error: #ba1a1a;
+  --color-surface: #f7f9fb;
+  --color-card: #ffffff;
+  --color-border: #c3c6ce;
+  --color-text: #191c1e;
+  --color-muted: #43474d;
+  --font-heading: "Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+  --shadow-card: 0 1px 3px rgba(15, 41, 66, 0.05), 0 1px 2px -1px rgba(15, 41, 66, 0.05);
+}

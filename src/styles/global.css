@@ -1,0 +1,159 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-surface);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-surface);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 1rem;
+}
+
+.auth-card {
+  width: min(100%, 28rem);
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-card);
+  box-shadow: var(--shadow-card);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.brand__icon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 0.5rem;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--font-heading);
+  color: var(--color-primary-dark);
+}
+
+h1 {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.field input {
+  min-height: 3rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  color: var(--color-text);
+}
+
+.field input:focus-visible,
+.button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  outline-offset: 2px;
+}
+
+.button {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--color-secondary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--color-secondary-dark);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.notice {
+  margin-top: 1rem;
+  padding: 0.875rem;
+  border-radius: 0.5rem;
+  background: #fff3ed;
+  color: #7d2810;
+}
+
+.business-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.business-list button {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-card);
+  color: var(--color-primary-dark);
+  text-align: left;
+}
+
+.business-list button:hover {
+  border-color: var(--color-secondary);
+}
+
+@media (min-width: 48rem) {
+  .auth-card {
+    padding: 2rem;
+  }
+}

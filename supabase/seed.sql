@@ -1,0 +1,2 @@
+-- Los datos de prueba se agregarán con entidades ficticias al definir los
+-- módulos operativos. Nunca se deben incluir datos reales del negocio.

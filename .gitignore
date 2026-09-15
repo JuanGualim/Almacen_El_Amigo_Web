@@ -1,0 +1,14 @@
+# Agentes de IA
+AGENTS.md
+PLANIFICACION.md
+
+# Dependencias, compilación y secretos locales
+node_modules/
+dist/
+.env.local
+.env.*.local
+
+# docs
+/docs
+
+/Diseños
