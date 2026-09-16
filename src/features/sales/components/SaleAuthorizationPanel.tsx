@@ -1,0 +1,14 @@
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { approveSalePriceAuthorization, getPendingSaleAuthorizations, setOwnerAuthorizationPin, type PendingSaleAuthorization } from '../services/salesService'
+
+export function SaleAuthorizationPanel({ businessId }: { businessId: string }) {
+  const [pending, setPending] = useState<PendingSaleAuthorization[]>([])
+  const [pin, setPin] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+  const [message, setMessage] = useState<string | null>(null)
+  const load = useCallback(async () => { try { setPending(await getPendingSaleAuthorizations(businessId)) } catch (error) { setMessage(error instanceof Error ? error.message : 'No fue posible cargar solicitudes.') } }, [businessId])
+  useEffect(() => { const timeoutId = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(timeoutId) }, [load])
+  async function savePin(event: FormEvent<HTMLFormElement>) { event.preventDefault(); try { await setOwnerAuthorizationPin(businessId, pin, confirmation); setPin(''); setConfirmation(''); setMessage('PIN actualizado. Las autorizaciones pendientes fueron invalidadas.'); await load() } catch (error) { setMessage(error instanceof Error ? error.message : 'No fue posible guardar el PIN.') } }
+  async function approve(item: PendingSaleAuthorization) { const enteredPin = window.prompt(`Autorizar solicitud: ${item.reason}. Ingresa tu PIN de seis dígitos:`); if (enteredPin === null) return; try { const approved = await approveSalePriceAuthorization(businessId, item.id, enteredPin); setMessage(approved ? 'Solicitud aprobada por cinco minutos.' : 'PIN inválido o bloqueado.'); await load() } catch (error) { setMessage(error instanceof Error ? error.message : 'No fue posible aprobar.') } }
+  return <section className="catalog-panel" aria-labelledby="authorization-title"><h2 id="authorization-title">Autorizaciones de precio</h2><form className="catalog-form" onSubmit={savePin}><h3>Configurar PIN</h3><label className="field">PIN de seis dígitos<input inputMode="numeric" type="password" pattern="[0-9]{6}" value={pin} onChange={(event) => setPin(event.target.value)} required /></label><label className="field">Confirmar PIN<input inputMode="numeric" type="password" pattern="[0-9]{6}" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} required /></label><button className="button button--compact">Guardar PIN</button></form>{pending.length > 0 ? <ul className="price-history-list">{pending.map((item) => <li key={item.id}><strong>Solicitud pendiente</strong><span>{item.reason}</span><button className="button button--compact" type="button" onClick={() => void approve(item)}>Aprobar con PIN</button></li>)}</ul> : <p className="muted">No hay solicitudes pendientes.</p>}{message ? <p className="notice" role="status">{message}</p> : null}</section>
+}

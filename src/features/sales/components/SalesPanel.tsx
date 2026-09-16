@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { formatCatalogAttributes } from '../../../domain/catalog/attributes'
 import { addMoney, formatGTQ, multiplyMoney, parseGTQ, serializeGTQ, type Money } from '../../../domain/money/money'
 import { getOpenCashRegisterSummary, type CashRegisterSummary } from '../../cash-register/services/cashRegisterService'
-import { confirmSale, getSellableVariants, type SaleLineInput, type SalePaymentMethod, type SellableVariant } from '../services/salesService'
+import { confirmSale, confirmSaleWithPriceAuthorization, getSellableVariants, requestSalePriceAuthorization, type SaleLineInput, type SalePaymentMethod, type SellableVariant } from '../services/salesService'
 
 type SalesPanelProps = {
   businessId: string
@@ -21,6 +21,8 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
   const [paymentMethod, setPaymentMethod] = useState<SalePaymentMethod>('cash')
   const [lines, setLines] = useState<CartLine[]>([])
   const [requestId, setRequestId] = useState(() => crypto.randomUUID())
+  const [authorizationId, setAuthorizationId] = useState<string | null>(null)
+  const [authorizationReason, setAuthorizationReason] = useState('')
   const [message, setMessage] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -61,7 +63,6 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
       if (!variant) throw new Error('Selecciona una variante disponible.')
       if (!Number.isSafeInteger(units) || units <= 0) throw new Error('La cantidad debe ser un entero positivo.')
       if (units > variant.availableQuantity) throw new Error(`Solo hay ${variant.availableQuantity} unidades disponibles.`)
-      if (price < variant.minimumPrice) throw new Error(`El precio no puede ser menor que ${formatGTQ(variant.minimumPrice)}.`)
       if (lines.some((line) => line.variantId === variant.variantId)) throw new Error('La variante ya está en el carrito.')
 
       const attributes = formatCatalogAttributes(variant.attributes)
@@ -86,10 +87,21 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
     try {
       if (!cashSummary) throw new Error('No hay caja abierta para confirmar la venta.')
       if (lines.length === 0) throw new Error('Agrega al menos una línea al carrito.')
+      const requiresAuthorization = lines.some((line) => line.unitPrice < line.minimumPrice)
+      if (requiresAuthorization && !authorizationId) {
+        const id = await requestSalePriceAuthorization(businessId, lines, authorizationReason, requestId)
+        setAuthorizationId(id)
+        setMessage('Solicitud enviada. El dueño debe aprobarla presencialmente con su PIN antes de confirmar.')
+        return
+      }
       if (!window.confirm(`Confirmar venta por ${formatGTQ(total)}?`)) return
-      const saleId = await confirmSale(businessId, cashSummary.cashSessionId, paymentMethod, lines, requestId)
+      const saleId = authorizationId
+        ? await confirmSaleWithPriceAuthorization(businessId, cashSummary.cashSessionId, paymentMethod, lines, requestId, authorizationId)
+        : await confirmSale(businessId, cashSummary.cashSessionId, paymentMethod, lines, requestId)
       setLines([])
       setRequestId(crypto.randomUUID())
+      setAuthorizationId(null)
+      setAuthorizationReason('')
       setMessage(`Venta ${saleId.slice(0, 8)} confirmada. Inventario y caja actualizados.`)
       await load()
       onSaleConfirmed()
@@ -106,6 +118,7 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
       <button className="button button--compact" type="button" onClick={handleAddLine}>Agregar al carrito</button>
       {lines.length > 0 ? <ul className="price-history-list">{lines.map((line) => <li key={line.variantId}><strong>{line.description}</strong><span>{line.quantity} × {formatGTQ(line.unitPrice)} = {formatGTQ(multiplyMoney(line.unitPrice, line.quantity))}</span><span>Mínimo histórico al confirmar: {formatGTQ(line.minimumPrice)}</span><button className="button button--compact" type="button" onClick={() => setLines((currentLines) => currentLines.filter((currentLine) => currentLine.variantId !== line.variantId))}>Quitar</button></li>)}</ul> : <p className="muted">Busca una variante disponible y agrégala al carrito.</p>}
       <p><strong>Total: {formatGTQ(total)}</strong></p>
+      {lines.some((line) => line.unitPrice < line.minimumPrice) ? <label className="field">Motivo para precio bajo mínimo<textarea value={authorizationReason} onChange={(event) => setAuthorizationReason(event.target.value)} required maxLength={300} /></label> : null}
       <label className="field">Forma de pago<select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value as SalePaymentMethod)}><option value="cash">Efectivo</option><option value="qr">QR bancario</option><option value="transfer">Transferencia</option><option value="card">Tarjeta</option></select></label>
       <button className="button">Confirmar venta</button>
     </form>}

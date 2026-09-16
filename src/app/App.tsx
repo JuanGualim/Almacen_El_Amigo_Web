@@ -10,6 +10,7 @@ import { CatalogPanel } from '../features/catalog/components/CatalogPanel'
 import { CashRegisterPanel } from '../features/cash-register/components/CashRegisterPanel'
 import { PurchasePanel } from '../features/purchases/components/PurchasePanel'
 import { SalesPanel } from '../features/sales/components/SalesPanel'
+import { SaleAuthorizationPanel } from '../features/sales/components/SaleAuthorizationPanel'
 import { MemberManagement } from '../features/users/components/MemberManagement'
 import {
   getPendingBusinessInvitations,
@@ -166,6 +167,7 @@ export function App() {
           onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)}
           refreshToken={cashRefreshToken}
         />
+        {selectedBusiness.roleCode === 'owner' ? <SaleAuthorizationPanel businessId={selectedBusiness.businessId} /> : null}
         <button className="button" onClick={() => void handleSignOut()} type="button">
           Cerrar sesión
         </button>
