@@ -1,6 +1,6 @@
 begin;
 
-select plan(8);
+select plan(14);
 
 insert into auth.users (
   id,
@@ -45,10 +45,11 @@ values
 
 create temporary table test_context (
   first_business_id uuid,
-  second_business_id uuid
+  second_business_id uuid,
+  invitation_id uuid
 );
 
-grant select, insert, update on test_context to authenticated;
+grant select, insert, update on test_context to authenticated, service_role;
 
 set local role authenticated;
 select set_config('request.jwt.claim.role', 'authenticated', true);
@@ -119,6 +120,89 @@ select ok(
     'payables.read'
   ),
   'un usuario sin membresía no obtiene permisos del otro negocio'
+);
+
+set local role service_role;
+
+select throws_ok(
+  $$
+    select public.create_business_invitation(
+      '22222222-2222-2222-2222-222222222222',
+      (select first_business_id from test_context),
+      '11111111-1111-1111-1111-111111111111',
+      'owner@example.test',
+      '55555555-5555-4555-8555-555555555555'
+    )
+  $$,
+  'P0001',
+  'No tienes permiso para invitar personas a este negocio.',
+  'un usuario sin permiso no puede invitar personas a otro negocio'
+);
+
+update test_context
+set invitation_id = public.create_business_invitation(
+  '11111111-1111-1111-1111-111111111111',
+  first_business_id,
+  '22222222-2222-2222-2222-222222222222',
+  'employee@example.test',
+  '33333333-3333-4333-8333-333333333333'
+);
+
+select ok(
+  public.create_business_invitation(
+    '11111111-1111-1111-1111-111111111111',
+    (select first_business_id from test_context),
+    '22222222-2222-2222-2222-222222222222',
+    'employee@example.test',
+    '33333333-3333-4333-8333-333333333333'
+  ) = (select invitation_id from test_context),
+  'un reintento con la misma solicitud devuelve la invitación existente'
+);
+
+set local role authenticated;
+
+select ok(
+  exists (
+    select 1
+    from public.business_invitations invitation
+    join public.business_memberships membership on membership.id = invitation.membership_id
+    where invitation.id = (select invitation_id from test_context)
+      and membership.business_id = (select first_business_id from test_context)
+      and membership.user_id = '22222222-2222-2222-2222-222222222222'
+      and membership.status = 'invited'
+  ),
+  'la invitación crea una membresía pendiente para el empleado'
+);
+
+select is(
+  (select count(*) from public.get_my_pending_business_invitations()),
+  1::bigint,
+  'la persona invitada puede consultar solo su invitación pendiente'
+);
+
+select ok(
+  public.accept_business_invitation(
+    (
+      select membership_id
+      from public.business_invitations
+      where id = (select invitation_id from test_context)
+    )
+  ) = (select first_business_id from test_context),
+  'la persona invitada puede aceptar su propia invitación'
+);
+
+select ok(
+  public.has_business_permission(
+    (select first_business_id from test_context),
+    'sales.create'
+  )
+  and exists (
+    select 1
+    from public.business_invitations
+    where id = (select invitation_id from test_context)
+      and status = 'accepted'
+  ),
+  'al aceptar, el empleado queda activo con sus permisos iniciales'
 );
 
 select * from finish();

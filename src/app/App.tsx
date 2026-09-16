@@ -6,6 +6,11 @@ import {
   type BusinessMembership,
 } from '../features/businesses/services/businessService'
 import { LoginForm } from '../features/auth/components/LoginForm'
+import { MemberManagement } from '../features/users/components/MemberManagement'
+import {
+  getPendingBusinessInvitations,
+  type PendingBusinessInvitation,
+} from '../features/users/services/memberService'
 import { getCurrentSession, signOut } from '../services/auth/authService'
 import { isSupabaseConfigured } from '../services/api/supabaseClient'
 
@@ -15,13 +20,18 @@ export function App() {
   const [appState, setAppState] = useState<AppState>('loading')
   const [session, setSession] = useState<Session | null>(null)
   const [memberships, setMemberships] = useState<BusinessMembership[]>([])
+  const [pendingInvitations, setPendingInvitations] = useState<PendingBusinessInvitation[]>([])
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessMembership | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const loadMemberships = useCallback(async () => {
     try {
-      const nextMemberships = await getActiveBusinessMemberships()
+      const [nextMemberships, nextInvitations] = await Promise.all([
+        getActiveBusinessMemberships(),
+        getPendingBusinessInvitations(),
+      ])
       setMemberships(nextMemberships)
+      setPendingInvitations(nextInvitations)
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'No fue posible cargar los negocios.')
       setAppState('error')
@@ -65,6 +75,7 @@ export function App() {
     await signOut()
     setSession(null)
     setMemberships([])
+    setPendingInvitations([])
     setSelectedBusiness(null)
   }
 
@@ -114,7 +125,9 @@ export function App() {
       <main className="app-shell">
         <BusinessSelector
           memberships={memberships}
+          pendingInvitations={pendingInvitations}
           onBusinessCreated={loadMemberships}
+          onInvitationAccepted={loadMemberships}
           onBusinessSelected={setSelectedBusiness}
         />
       </main>
@@ -129,6 +142,9 @@ export function App() {
           Negocio activo · {selectedBusiness.roleName} · {selectedBusiness.timezone}
         </p>
         <p>La base técnica está lista. Los módulos operativos se incorporarán de forma incremental.</p>
+        {selectedBusiness.roleCode === 'owner' ? (
+          <MemberManagement businessId={selectedBusiness.businessId} />
+        ) : null}
         <button className="button" onClick={() => void handleSignOut()} type="button">
           Cerrar sesión
         </button>

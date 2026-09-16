@@ -4,6 +4,7 @@ export type BusinessMembership = {
   businessId: string
   businessName: string
   currencyCode: string
+  roleCode: 'owner' | 'employee'
   timezone: string
   roleName: string
 }
@@ -16,6 +17,7 @@ type MembershipRow = {
     timezone: string
   }>
   business_roles: RelatedRow<{
+    code: 'owner' | 'employee'
     name: string
   }>
 }
@@ -37,7 +39,7 @@ function firstRelatedRow<T>(relation: RelatedRow<T>): T | null {
 export async function getActiveBusinessMemberships(): Promise<BusinessMembership[]> {
   const { data, error } = await getSupabaseClient()
     .from('business_memberships')
-    .select('business_id, businesses(name, timezone, currency_code), business_roles(name)')
+    .select('business_id, businesses(name, timezone, currency_code), business_roles(code, name)')
     .eq('status', 'active')
 
   if (error) {
@@ -58,6 +60,7 @@ export async function getActiveBusinessMemberships(): Promise<BusinessMembership
       businessId: membership.business_id,
       businessName: business.name,
       currencyCode: business.currency_code,
+      roleCode: role.code,
       timezone: business.timezone,
       roleName: role.name,
     }]

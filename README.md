@@ -16,6 +16,7 @@ Está disponible la base técnica de la aplicación:
   aplicación; no almacena respuestas privadas en caché.
 - Inicio de sesión mediante Supabase Auth.
 - Creación y selección de negocios autorizados.
+- Invitación de empleados por correo, con aceptación explícita del acceso.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para
@@ -101,6 +102,29 @@ npm run dev
 ```
 
 Abre `http://127.0.0.1:3000` en el navegador.
+
+### 6. Probar invitaciones de empleados
+
+Con Supabase local y la PWA ejecutándose, inicia la Edge Function en una
+tercera terminal:
+
+```bash
+npm run supabase -- functions serve invite-business-member
+```
+
+Inicia sesión como dueño, selecciona el negocio y usa la sección **Equipo**
+para invitar un correo ficticio. En local, Supabase no envía correos reales:
+el mensaje se puede revisar en Mailpit, en `http://127.0.0.1:54324`.
+
+La persona invitada activa su cuenta desde el enlace y, al entrar a la PWA,
+acepta explícitamente la invitación antes de ver el negocio. Si ese correo ya
+corresponde a una cuenta, no se intenta crear una segunda: la persona verá la
+invitación pendiente al iniciar sesión.
+
+Para un despliegue real se debe configurar un proveedor SMTP, registrar la URL
+exacta de producción para `/auth/accept-invitation` en Supabase Auth y definir
+`APP_URL` como secreto de la Edge Function. Nunca se debe configurar ni exponer
+la clave `SUPABASE_SERVICE_ROLE_KEY` en el frontend.
 
 Para detener únicamente el stack local al terminar:
 

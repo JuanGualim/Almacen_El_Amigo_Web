@@ -122,6 +122,12 @@ h1 {
   opacity: 0.6;
 }
 
+.button--compact {
+  width: auto;
+  min-height: 2.75rem;
+  margin-top: 0.75rem;
+}
+
 .notice {
   margin-top: 1rem;
   padding: 0.875rem;
@@ -130,11 +136,51 @@ h1 {
   color: #7d2810;
 }
 
+.notice--success {
+  background: #e0f7ee;
+  color: #00513b;
+}
+
 .business-list {
   display: grid;
   gap: 0.75rem;
   padding: 0;
   list-style: none;
+}
+
+.invitation-panel,
+.member-panel {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.invitation-panel h2,
+.member-panel h2,
+.member-panel h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+}
+
+.invitation-list,
+.member-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.invitation-list li,
+.member-list li {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.member-form {
+  margin-bottom: 1.5rem;
 }
 
 .business-list button {

@@ -3,15 +3,21 @@ import {
   createBusiness,
   type BusinessMembership,
 } from '../services/businessService'
+import { BusinessInvitationList } from '../../users/components/BusinessInvitationList'
+import type { PendingBusinessInvitation } from '../../users/services/memberService'
 
 type BusinessSelectorProps = {
   memberships: readonly BusinessMembership[]
+  pendingInvitations: readonly PendingBusinessInvitation[]
+  onInvitationAccepted: () => Promise<void>
   onBusinessSelected: (business: BusinessMembership) => void
   onBusinessCreated: () => Promise<void>
 }
 
 export function BusinessSelector({
   memberships,
+  pendingInvitations,
+  onInvitationAccepted,
   onBusinessSelected,
   onBusinessCreated,
 }: BusinessSelectorProps) {
@@ -60,6 +66,10 @@ export function BusinessSelector({
       ) : (
         <p className="muted">Aún no tienes un negocio asignado.</p>
       )}
+      <BusinessInvitationList
+        invitations={pendingInvitations}
+        onInvitationAccepted={onInvitationAccepted}
+      />
       <form onSubmit={handleCreate}>
         <label className="field" htmlFor="business-name">
           Crear mi primer negocio
