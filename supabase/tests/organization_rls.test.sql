@@ -1,6 +1,6 @@
 begin;
 
-select plan(20);
+select plan(27);
 
 insert into auth.users (
   id,
@@ -47,7 +47,10 @@ create temporary table test_context (
   first_business_id uuid,
   second_business_id uuid,
   invitation_id uuid,
-  catalog_variant_id uuid
+  catalog_variant_id uuid,
+  supplier_id uuid,
+  first_purchase_id uuid,
+  second_purchase_id uuid
 );
 
 grant select, insert, update on test_context to authenticated, service_role;
@@ -262,6 +265,57 @@ select ok(
   'el empleado autorizado puede buscar la variante y sus precios permitidos'
 );
 
+update test_context
+set supplier_id = public.create_supplier(
+  first_business_id,
+  'Distribuidor de Prueba',
+  'Contacto de prueba'
+);
+
+update test_context
+set first_purchase_id = public.record_purchase(
+  first_business_id,
+  supplier_id,
+  'credit',
+  'FAC-001',
+  now(),
+  0,
+  jsonb_build_array(jsonb_build_object(
+    'variant_id', catalog_variant_id,
+    'quantity', 2,
+    'unit_cost', 80.00
+  )),
+  '66666666-6666-4666-8666-666666666666'
+);
+
+select ok(
+  exists (
+    select 1 from public.purchases
+    where id = (select first_purchase_id from test_context)
+      and status = 'pending_confirmation'
+  )
+  and not exists (
+    select 1 from public.inventory_movements
+    where source_id in (
+      select id from public.purchase_lines where purchase_id = (select first_purchase_id from test_context)
+    )
+  ),
+  'registrar una compra pendiente no altera el inventario'
+);
+
+select throws_ok(
+  $$
+    select public.confirm_purchase(
+      (select first_business_id from test_context),
+      (select first_purchase_id from test_context),
+      '77777777-7777-4777-8777-777777777777'
+    )
+  $$,
+  'P0001',
+  'No tienes permiso para confirmar compras.',
+  'un empleado no puede confirmar una compra sin permiso adicional'
+);
+
 select set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', true);
 
 select lives_ok(
@@ -291,6 +345,85 @@ select ok(
     where variant_id = (select catalog_variant_id from test_context)
   ) = 3,
   'actualizar un precio conserva el anterior en el historial y no duplica el mínimo sin cambio'
+);
+
+select lives_ok(
+  $$
+    select public.confirm_purchase(
+      (select first_business_id from test_context),
+      (select first_purchase_id from test_context),
+      '77777777-7777-4777-8777-777777777777'
+    )
+  $$,
+  'el dueño confirma una compra pendiente'
+);
+
+select ok(
+  exists (
+    select 1 from public.inventory_lots lot
+    join public.inventory_movements movement on movement.lot_id = lot.id
+    where lot.purchase_line_id in (
+      select id from public.purchase_lines where purchase_id = (select first_purchase_id from test_context)
+    )
+      and movement.quantity_delta = 2
+      and movement.inventory_state = 'available'
+  )
+  and exists (
+    select 1 from public.supplier_account_entries
+    where purchase_id = (select first_purchase_id from test_context)
+      and entry_type = 'purchase_charge'
+      and amount = 160.00
+  ),
+  'confirmar la compra crea lote, movimiento y cargo trazable exactamente una vez'
+);
+
+update test_context
+set second_purchase_id = public.record_purchase(
+  first_business_id,
+  supplier_id,
+  'partial',
+  'FAC-002',
+  now(),
+  20.00,
+  jsonb_build_array(jsonb_build_object(
+    'variant_id', catalog_variant_id,
+    'quantity', 1,
+    'unit_cost', 90.00
+  )),
+  '88888888-8888-4888-8888-888888888888'
+);
+
+select lives_ok(
+  $$
+    select public.confirm_purchase(
+      (select first_business_id from test_context),
+      (select second_purchase_id from test_context),
+      '99999999-9999-4999-8999-999999999999'
+    )
+  $$,
+  'el dueño confirma una compra parcial'
+);
+
+select ok(
+  exists (
+    select 1 from public.purchase_price_reviews
+    where purchase_line_id in (
+      select id from public.purchase_lines where purchase_id = (select second_purchase_id from test_context)
+    )
+      and previous_unit_cost = 80.00
+      and current_unit_cost = 90.00
+  ),
+  'un costo mayor deja una revisión de precio pendiente'
+);
+
+select is(
+  (
+    select available_quantity
+    from public.get_inventory_variants((select first_business_id from test_context), null)
+    where variant_id = (select catalog_variant_id from test_context)
+  ),
+  3::bigint,
+  'la existencia se deriva de los movimientos confirmados'
 );
 
 select * from finish();

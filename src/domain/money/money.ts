@@ -44,3 +44,11 @@ export function serializeGTQ(value: Money): string {
 export function addMoney(...values: Money[]): Money {
   return moneyFromMinorUnits(values.reduce((sum, value) => sum + value, 0))
 }
+
+export function multiplyMoney(value: Money, quantity: number): Money {
+  if (!Number.isSafeInteger(quantity) || quantity < 0) {
+    throw new Error('La cantidad debe ser un entero no negativo seguro.')
+  }
+
+  return moneyFromMinorUnits(value * quantity)
+}

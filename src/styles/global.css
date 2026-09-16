@@ -15,7 +15,8 @@ body {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -91,6 +92,15 @@ h1 {
   border: 1px solid var(--color-border);
   border-radius: 0.25rem;
   color: var(--color-text);
+}
+
+.field select {
+  min-height: 3rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  color: var(--color-text);
+  background: var(--color-card);
 }
 
 .field textarea {
