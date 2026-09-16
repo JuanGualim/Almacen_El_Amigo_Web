@@ -2,6 +2,7 @@ import { parseGTQ, serializeGTQ, type Money } from '../../../domain/money/money'
 import { getSupabaseClient } from '../../../services/api/supabaseClient'
 
 export type Supplier = { id: string; name: string }
+export type SupplierDirectoryEntry = Supplier & { isActive: boolean }
 export type PendingPurchase = { id: string; purchaseNumber: string; totalAmount: Money }
 export type PurchasePaymentType = 'cash' | 'credit' | 'partial'
 export type PurchaseLineInput = { variantId: string; quantity: number; unitCost: Money }
@@ -10,11 +11,24 @@ export type InventoryVariant = {
   productName: string
   variantCode: string
 }
+export type PurchasePriceReview = {
+  currentUnitCost: Money
+  id: string
+  previousUnitCost: Money
+  variantId: string
+}
 
 type InventoryVariantRow = {
   available_quantity: number | string
   product_name: string
   variant_code: string
+}
+
+type PurchasePriceReviewRow = {
+  current_unit_cost: number | string
+  id: string
+  previous_unit_cost: number | string
+  variant_id: string
 }
 
 export async function getSuppliers(businessId: string): Promise<Supplier[]> {
@@ -28,11 +42,49 @@ export async function getSuppliers(businessId: string): Promise<Supplier[]> {
   return (data ?? []) as Supplier[]
 }
 
-export async function createSupplier(businessId: string, name: string): Promise<void> {
+export async function createSupplier(
+  businessId: string,
+  name: string,
+  contactName: string,
+  phone: string,
+): Promise<void> {
   const { error } = await getSupabaseClient().rpc('create_supplier', {
-    p_business_id: businessId, p_name: name,
+    p_business_id: businessId,
+    p_contact_name: contactName.trim() || null,
+    p_name: name,
+    p_phone: phone.trim() || null,
   })
   if (error) throw new Error('No fue posible crear el distribuidor.')
+}
+
+export async function getSupplierDirectory(businessId: string): Promise<SupplierDirectoryEntry[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('suppliers')
+    .select('id, name, is_active')
+    .eq('business_id', businessId)
+    .order('name')
+
+  if (error) throw new Error('No fue posible cargar el directorio de distribuidores.')
+
+  return (data ?? []).map((row) => ({
+    id: row.id as string,
+    isActive: row.is_active as boolean,
+    name: row.name as string,
+  }))
+}
+
+export async function setSupplierActiveStatus(
+  businessId: string,
+  supplierId: string,
+  isActive: boolean,
+): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('set_supplier_active_status', {
+    p_business_id: businessId,
+    p_is_active: isActive,
+    p_supplier_id: supplierId,
+  })
+
+  if (error) throw new Error('No fue posible cambiar el estado del distribuidor.')
 }
 
 export async function recordPurchase(
@@ -96,4 +148,36 @@ export async function getInventoryVariants(businessId: string): Promise<Inventor
     productName: row.product_name,
     variantCode: row.variant_code,
   }))
+}
+
+export async function getPendingPurchasePriceReviews(businessId: string): Promise<PurchasePriceReview[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('purchase_price_reviews')
+    .select('id, variant_id, previous_unit_cost, current_unit_cost')
+    .eq('business_id', businessId)
+    .eq('status', 'pending')
+    .order('created_at')
+
+  if (error) throw new Error('No fue posible cargar las revisiones de precio.')
+
+  return ((data ?? []) as PurchasePriceReviewRow[]).map((row) => ({
+    currentUnitCost: parseGTQ(String(row.current_unit_cost)),
+    id: row.id,
+    previousUnitCost: parseGTQ(String(row.previous_unit_cost)),
+    variantId: row.variant_id,
+  }))
+}
+
+export async function resolvePurchasePriceReview(
+  businessId: string,
+  reviewId: string,
+  reason: string,
+): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('resolve_purchase_price_review', {
+    p_business_id: businessId,
+    p_reason: reason,
+    p_review_id: reviewId,
+  })
+
+  if (error) throw new Error('No fue posible resolver la revisión de precio.')
 }

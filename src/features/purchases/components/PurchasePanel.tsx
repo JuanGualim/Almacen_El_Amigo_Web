@@ -1,17 +1,23 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { addMoney, formatGTQ, multiplyMoney, parseGTQ, type Money } from '../../../domain/money/money'
+import { addMoney, formatGTQ, multiplyMoney, parseGTQ } from '../../../domain/money/money'
 import { getCatalogVariants, getVariantDescription, type CatalogVariant } from '../../catalog/services/catalogService'
 import {
   confirmPurchase,
   createSupplier,
   getInventoryVariants,
   getPendingPurchases,
+  getPendingPurchasePriceReviews,
+  getSupplierDirectory,
   getSuppliers,
   recordPurchase,
+  resolvePurchasePriceReview,
+  setSupplierActiveStatus,
   type InventoryVariant,
   type PendingPurchase,
   type PurchaseLineInput,
   type PurchasePaymentType,
+  type PurchasePriceReview,
+  type SupplierDirectoryEntry,
   type Supplier,
 } from '../services/purchaseService'
 
@@ -38,6 +44,8 @@ export function PurchasePanel({ businessId, canConfirm }: PurchasePanelProps) {
   const [variants, setVariants] = useState<CatalogVariant[]>([])
   const [inventory, setInventory] = useState<InventoryVariant[]>([])
   const [pending, setPending] = useState<PendingPurchase[]>([])
+  const [pendingPriceReviews, setPendingPriceReviews] = useState<PurchasePriceReview[]>([])
+  const [supplierDirectory, setSupplierDirectory] = useState<SupplierDirectoryEntry[]>([])
   const [supplierName, setSupplierName] = useState('')
   const [supplierContact, setSupplierContact] = useState('')
   const [supplierPhone, setSupplierPhone] = useState('')
@@ -55,16 +63,20 @@ export function PurchasePanel({ businessId, canConfirm }: PurchasePanelProps) {
 
   const load = useCallback(async () => {
     try {
-      const [nextSuppliers, nextVariants, nextInventory, nextPending] = await Promise.all([
+      const [nextSuppliers, nextVariants, nextInventory, nextPending, nextPriceReviews, nextSupplierDirectory] = await Promise.all([
         getSuppliers(businessId),
         getCatalogVariants(businessId, ''),
         getInventoryVariants(businessId),
         canConfirm ? getPendingPurchases(businessId) : Promise.resolve([]),
+        canConfirm ? getPendingPurchasePriceReviews(businessId) : Promise.resolve([]),
+        canConfirm ? getSupplierDirectory(businessId) : Promise.resolve([]),
       ])
       setSuppliers(nextSuppliers)
       setVariants(nextVariants)
       setInventory(nextInventory)
       setPending(nextPending)
+      setPendingPriceReviews(nextPriceReviews)
+      setSupplierDirectory(nextSupplierDirectory)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No fue posible cargar compras.')
     }
@@ -182,6 +194,38 @@ export function PurchasePanel({ businessId, canConfirm }: PurchasePanelProps) {
     }
   }
 
+  async function handleSupplierStatus(supplier: SupplierDirectoryEntry) {
+    const nextStatus = !supplier.isActive
+    const action = nextStatus ? 'reactivar' : 'desactivar'
+    if (!window.confirm(`¿Deseas ${action} a ${supplier.name}? Su historial no se eliminará.`)) {
+      return
+    }
+    try {
+      await setSupplierActiveStatus(businessId, supplier.id, nextStatus)
+      setMessage(`Distribuidor ${nextStatus ? 'activo' : 'inactivo'}.`)
+      await load()
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No fue posible cambiar el estado del distribuidor.')
+    }
+  }
+
+  async function handleResolvePriceReview(review: PurchasePriceReview) {
+    const reason = window.prompt('Indica la decisión o motivo para esta revisión de costo:')
+    if (reason === null) return
+    try {
+      await resolvePurchasePriceReview(businessId, review.id, reason)
+      setMessage('Revisión de precio resuelta sin cambiar el precio vigente.')
+      await load()
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No fue posible resolver la revisión de precio.')
+    }
+  }
+
+  function getVariantName(variantId: string): string {
+    const variant = variants.find((catalogVariant) => catalogVariant.variantId === variantId)
+    return variant ? `${variant.productName} · ${variant.variantCode}` : 'Variante de catálogo'
+  }
+
   return <section className="catalog-panel" aria-labelledby="purchase-title">
     <h2 id="purchase-title">Compras e inventario</h2>
     <p className="muted">Una compra solo modifica existencias cuando queda confirmada.</p>
@@ -216,6 +260,8 @@ export function PurchasePanel({ businessId, canConfirm }: PurchasePanelProps) {
     </section>
 
     {canConfirm && pending.length > 0 ? <><h3>Compras pendientes</h3><ul className="price-history-list">{pending.map((purchase) => <li key={purchase.id}><strong>{purchase.purchaseNumber} · {formatGTQ(purchase.totalAmount)}</strong><button className="button button--compact" type="button" onClick={() => void handleConfirm(purchase)}>Confirmar</button></li>)}</ul></> : null}
+    {canConfirm && pendingPriceReviews.length > 0 ? <><h3>Costos por revisar</h3><p className="muted">Resolver una revisión no modifica el precio de venta. Actualízalo desde el catálogo si corresponde.</p><ul className="price-history-list">{pendingPriceReviews.map((review) => <li key={review.id}><strong>{getVariantName(review.variantId)}</strong><span>Costo anterior: {formatGTQ(review.previousUnitCost)} · costo nuevo: {formatGTQ(review.currentUnitCost)}</span><button className="button button--compact" type="button" onClick={() => void handleResolvePriceReview(review)}>Resolver revisión</button></li>)}</ul></> : null}
+    {canConfirm && supplierDirectory.length > 0 ? <><h3>Estado de distribuidores</h3><ul className="price-history-list">{supplierDirectory.map((supplier) => <li key={supplier.id}><strong>{supplier.name}</strong><span>{supplier.isActive ? 'Activo' : 'Inactivo'}</span><button className="button button--compact" type="button" onClick={() => void handleSupplierStatus(supplier)}>{supplier.isActive ? 'Desactivar' : 'Reactivar'}</button></li>)}</ul></> : null}
     {message ? <p className="notice" role="status">{message}</p> : null}
   </section>
 }

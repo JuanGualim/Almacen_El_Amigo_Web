@@ -19,15 +19,21 @@ Está disponible la base técnica de la aplicación:
 - Invitación de empleados por correo, con aceptación explícita del acceso.
 - Catálogo de categorías, marcas, productos, variantes y atributos flexibles.
 - Precios sugeridos y mínimos con historial inmutable y permisos de consulta.
+- Distribuidores activos, compras de contado, crédito o pago parcial, y sus
+  lotes con costo histórico.
+- Movimientos de inventario derivados exclusivamente de compras confirmadas,
+  con existencias disponibles calculadas a partir de esos movimientos.
+- Cargos iniciales de cuentas por pagar y revisiones auditables cuando un costo
+  aumenta, sin cambiar precios de venta automáticamente.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para
   acceso cruzado entre negocios.
 
-Los módulos de inventario con movimientos, compras, ventas y caja se
-desarrollarán en las fases siguientes. El catálogo actual no registra ni
-modifica existencias; los prototipos visuales no implican funcionalidades
-implementadas.
+Los módulos de ventas, caja, abonos, ajustes, cambios y mercadería defectuosa
+se desarrollarán en las fases siguientes. Las existencias no se editan
+directamente: esta fase solo las aumenta mediante compras confirmadas; los
+prototipos visuales no implican funcionalidades implementadas.
 
 ## Tecnologías
 

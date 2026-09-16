@@ -1,6 +1,6 @@
 begin;
 
-select plan(27);
+select plan(31);
 
 insert into auth.users (
   id,
@@ -412,8 +412,31 @@ select ok(
     )
       and previous_unit_cost = 80.00
       and current_unit_cost = 90.00
+      and status = 'pending'
   ),
   'un costo mayor deja una revisión de precio pendiente'
+);
+
+select lives_ok(
+  $$
+    select public.resolve_purchase_price_review(
+      (select first_business_id from test_context),
+      (select id from public.purchase_price_reviews limit 1),
+      'El dueño mantendrá el precio actual.'
+    )
+  $$,
+  'el dueño puede resolver una revisión sin cambiar precios automáticamente'
+);
+
+select ok(
+  exists (
+    select 1 from public.purchase_price_reviews where status = 'resolved'
+  )
+  and exists (
+    select 1 from public.audit_events
+    where event_type = 'purchase_price_review.resolved'
+  ),
+  'la decisión sobre el precio queda auditada'
 );
 
 select is(
@@ -424,6 +447,41 @@ select is(
   ),
   3::bigint,
   'la existencia se deriva de los movimientos confirmados'
+);
+
+select lives_ok(
+  $$
+    select public.set_supplier_active_status(
+      (select first_business_id from test_context),
+      (select supplier_id from test_context),
+      false
+    )
+  $$,
+  'el dueño puede desactivar un distribuidor sin borrar su historial'
+);
+
+select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', true);
+
+select throws_ok(
+  $$
+    select public.record_purchase(
+      (select first_business_id from test_context),
+      (select supplier_id from test_context),
+      'cash',
+      'FAC-003',
+      now(),
+      1.00,
+      jsonb_build_array(jsonb_build_object(
+        'variant_id', (select catalog_variant_id from test_context),
+        'quantity', 1,
+        'unit_cost', 1.00
+      )),
+      'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+    )
+  $$,
+  'P0001',
+  'El distribuidor no está activo en este negocio.',
+  'una compra no puede registrarse contra un distribuidor inactivo'
 );
 
 select * from finish();
