@@ -1,6 +1,6 @@
 begin;
 
-select plan(14);
+select plan(20);
 
 insert into auth.users (
   id,
@@ -46,7 +46,8 @@ values
 create temporary table test_context (
   first_business_id uuid,
   second_business_id uuid,
-  invitation_id uuid
+  invitation_id uuid,
+  catalog_variant_id uuid
 );
 
 grant select, insert, update on test_context to authenticated, service_role;
@@ -85,6 +86,41 @@ select ok(
   'el dueño tiene el permiso sensible de cuentas por pagar'
 );
 
+update test_context
+set catalog_variant_id = public.create_catalog_product(
+  first_business_id,
+  'Camisas',
+  'Manhattan',
+  'Camisa lisa de manga larga',
+  '{"design":"Liso"}'::jsonb,
+  '{"color":"Blanca","size":"15"}'::jsonb,
+  185.00,
+  160.00
+);
+
+select ok(
+  exists (
+    select 1
+    from public.product_variants variant
+    join public.variant_current_prices price on price.variant_id = variant.id
+    where variant.id = (select catalog_variant_id from test_context)
+      and variant.internal_code like 'ALM-%-001'
+      and price.suggested_price = 185.00
+      and price.minimum_price = 160.00
+  ),
+  'crear un producto genera su primera variante y precios exactos'
+);
+
+select is(
+  (
+    select count(*)
+    from public.variant_price_history
+    where variant_id = (select catalog_variant_id from test_context)
+  ),
+  2::bigint,
+  'los precios iniciales quedan en el historial inmutable'
+);
+
 select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', true);
 
 update test_context
@@ -120,6 +156,16 @@ select ok(
     'payables.read'
   ),
   'un usuario sin membresía no obtiene permisos del otro negocio'
+);
+
+select throws_ok(
+  $$
+    select *
+    from public.get_catalog_variants((select first_business_id from test_context), null)
+  $$,
+  'P0001',
+  'No tienes permiso para consultar el catálogo de este negocio.',
+  'un usuario no puede consultar el catálogo de otro negocio'
 );
 
 set local role service_role;
@@ -203,6 +249,48 @@ select ok(
       and status = 'accepted'
   ),
   'al aceptar, el empleado queda activo con sus permisos iniciales'
+);
+
+select ok(
+  exists (
+    select 1
+    from public.get_catalog_variants((select first_business_id from test_context), 'Blanca') catalog
+    where catalog.variant_id = (select catalog_variant_id from test_context)
+      and catalog.suggested_price = 185.00
+      and catalog.minimum_price = 160.00
+  ),
+  'el empleado autorizado puede buscar la variante y sus precios permitidos'
+);
+
+select set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', true);
+
+select lives_ok(
+  $$
+    select public.update_variant_prices(
+      (select first_business_id from test_context),
+      (select catalog_variant_id from test_context),
+      190.00,
+      160.00,
+      'Revisión de etiqueta'
+    )
+  $$,
+  'el dueño puede actualizar un precio vigente con motivo'
+);
+
+select ok(
+  exists (
+    select 1
+    from public.variant_current_prices
+    where variant_id = (select catalog_variant_id from test_context)
+      and suggested_price = 190.00
+      and minimum_price = 160.00
+  )
+  and (
+    select count(*)
+    from public.variant_price_history
+    where variant_id = (select catalog_variant_id from test_context)
+  ) = 3,
+  'actualizar un precio conserva el anterior en el historial y no duplica el mínimo sin cambio'
 );
 
 select * from finish();

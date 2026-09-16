@@ -33,6 +33,14 @@ export function formatGTQ(value: Money): string {
   }).format(value / 100)
 }
 
+export function serializeGTQ(value: Money): string {
+  const absoluteValue = Math.abs(value)
+  const whole = Math.trunc(absoluteValue / 100)
+  const fraction = String(absoluteValue % 100).padStart(GTQ_FRACTION_DIGITS, '0')
+
+  return `${value < 0 ? '-' : ''}${whole}.${fraction}`
+}
+
 export function addMoney(...values: Money[]): Money {
   return moneyFromMinorUnits(values.reduce((sum, value) => sum + value, 0))
 }

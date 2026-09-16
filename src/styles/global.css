@@ -14,7 +14,8 @@ body {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
@@ -92,7 +93,17 @@ h1 {
   color: var(--color-text);
 }
 
+.field textarea {
+  min-height: 5.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  color: var(--color-text);
+  resize: vertical;
+}
+
 .field input:focus-visible,
+.field textarea:focus-visible,
 .button:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
   outline-offset: 2px;
@@ -183,6 +194,68 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
+.catalog-panel,
+.catalog-editor,
+.catalog-price-history {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.catalog-panel h2,
+.catalog-panel h3,
+.catalog-panel h4 {
+  margin-bottom: 0.5rem;
+}
+
+.catalog-form,
+.catalog-search {
+  margin-top: 1.25rem;
+}
+
+.catalog-price-fields {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.catalog-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.price-history-list {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.price-history-list li {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.75rem;
+  border-left: 3px solid var(--color-secondary);
+  background: var(--color-surface-container-low, #f2f4f6);
+}
+
+.catalog-card {
+  display: grid;
+  width: 100%;
+  gap: 0.35rem;
+  padding: 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-card);
+  color: var(--color-text);
+  text-align: left;
+}
+
+.catalog-card:hover {
+  border-color: var(--color-secondary);
+}
+
 .business-list button {
   width: 100%;
   min-height: 3.25rem;
@@ -201,5 +274,9 @@ h1 {
 @media (min-width: 48rem) {
   .auth-card {
     padding: 2rem;
+  }
+
+  .catalog-price-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

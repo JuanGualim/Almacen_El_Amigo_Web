@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addMoney, formatGTQ, moneyFromMinorUnits, parseGTQ } from './money'
+import { addMoney, formatGTQ, moneyFromMinorUnits, parseGTQ, serializeGTQ } from './money'
 
 describe('money', () => {
   it('parses GTQ without floating point arithmetic', () => {
@@ -14,5 +14,9 @@ describe('money', () => {
   it('adds and formats exact minor units', () => {
     expect(addMoney(moneyFromMinorUnits(10), moneyFromMinorUnits(20))).toBe(30)
     expect(formatGTQ(moneyFromMinorUnits(18_525))).toContain('185.25')
+  })
+
+  it('serializes money for PostgreSQL without floating point conversion', () => {
+    expect(serializeGTQ(moneyFromMinorUnits(18_575))).toBe('185.75')
   })
 })

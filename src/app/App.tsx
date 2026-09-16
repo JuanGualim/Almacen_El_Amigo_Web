@@ -6,6 +6,7 @@ import {
   type BusinessMembership,
 } from '../features/businesses/services/businessService'
 import { LoginForm } from '../features/auth/components/LoginForm'
+import { CatalogPanel } from '../features/catalog/components/CatalogPanel'
 import { MemberManagement } from '../features/users/components/MemberManagement'
 import {
   getPendingBusinessInvitations,
@@ -145,6 +146,10 @@ export function App() {
         {selectedBusiness.roleCode === 'owner' ? (
           <MemberManagement businessId={selectedBusiness.businessId} />
         ) : null}
+        <CatalogPanel
+          businessId={selectedBusiness.businessId}
+          canManage={selectedBusiness.roleCode === 'owner'}
+        />
         <button className="button" onClick={() => void handleSignOut()} type="button">
           Cerrar sesión
         </button>

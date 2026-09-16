@@ -17,14 +17,17 @@ Está disponible la base técnica de la aplicación:
 - Inicio de sesión mediante Supabase Auth.
 - Creación y selección de negocios autorizados.
 - Invitación de empleados por correo, con aceptación explícita del acceso.
+- Catálogo de categorías, marcas, productos, variantes y atributos flexibles.
+- Precios sugeridos y mínimos con historial inmutable y permisos de consulta.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para
   acceso cruzado entre negocios.
 
-Los módulos de catálogo, inventario, ventas, compras y caja se desarrollarán
-en las fases siguientes. No se deben considerar implementados por la presencia
-de los prototipos visuales.
+Los módulos de inventario con movimientos, compras, ventas y caja se
+desarrollarán en las fases siguientes. El catálogo actual no registra ni
+modifica existencias; los prototipos visuales no implican funcionalidades
+implementadas.
 
 ## Tecnologías
 
