@@ -25,15 +25,21 @@ Está disponible la base técnica de la aplicación:
   con existencias disponibles calculadas a partir de esos movimientos.
 - Cargos iniciales de cuentas por pagar y revisiones auditables cuando un costo
   aumenta, sin cambiar precios de venta automáticamente.
+- Apertura y cierre de la única caja de ventas, con fondo inicial, efectivo
+  esperado, efectivo contado y diferencia trazable.
+- Ventas confirmadas atómicamente con líneas y precios históricos, pagos por
+  efectivo, QR, transferencia o tarjeta, y reducción de inventario una sola
+  vez.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para
   acceso cruzado entre negocios.
 
-Los módulos de ventas, caja, abonos, ajustes, cambios y mercadería defectuosa
-se desarrollarán en las fases siguientes. Las existencias no se editan
-directamente: esta fase solo las aumenta mediante compras confirmadas; los
-prototipos visuales no implican funcionalidades implementadas.
+Los módulos de abonos, ajustes, cambios, salidas y mercadería defectuosa se
+desarrollarán en las fases siguientes. Las existencias no se editan
+directamente: compras y ventas confirmadas son las únicas operaciones de esta
+etapa que las modifican; los prototipos visuales no implican funcionalidades
+implementadas.
 
 ## Tecnologías
 

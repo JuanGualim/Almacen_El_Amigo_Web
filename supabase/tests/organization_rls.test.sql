@@ -1,6 +1,6 @@
 begin;
 
-select plan(31);
+select plan(39);
 
 insert into auth.users (
   id,
@@ -50,7 +50,10 @@ create temporary table test_context (
   catalog_variant_id uuid,
   supplier_id uuid,
   first_purchase_id uuid,
-  second_purchase_id uuid
+  second_purchase_id uuid,
+  cash_session_id uuid,
+  qr_sale_id uuid,
+  cash_sale_id uuid
 );
 
 grant select, insert, update on test_context to authenticated, service_role;
@@ -448,6 +451,157 @@ select is(
   3::bigint,
   'la existencia se deriva de los movimientos confirmados'
 );
+
+update test_context
+set cash_session_id = public.open_cash_register(
+  first_business_id,
+  50.00,
+  'Fondo inicial de prueba',
+  'abababab-abab-4bab-8bab-abababababab'
+);
+
+select ok(
+  exists (
+    select 1 from public.cash_register_sessions
+    where id = (select cash_session_id from test_context)
+      and status = 'open'
+      and opening_fund = 50.00
+  ),
+  'el dueño abre la única caja de ventas con su fondo inicial'
+);
+
+select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', true);
+
+select throws_ok(
+  $$
+    select public.confirm_sale(
+      (select first_business_id from test_context),
+      (select cash_session_id from test_context),
+      'cash',
+      jsonb_build_array(jsonb_build_object(
+        'variant_id', (select catalog_variant_id from test_context),
+        'quantity', 1,
+        'unit_price', 150.00
+      )),
+      'b1b1b1b1-b1b1-4b1b-8b1b-b1b1b1b1b1b1'
+    )
+  $$,
+  'P0001',
+  'El precio negociado no puede ser menor al precio mínimo.',
+  'el empleado no puede confirmar una venta debajo del precio mínimo'
+);
+
+update test_context
+set qr_sale_id = public.confirm_sale(
+  first_business_id,
+  cash_session_id,
+  'qr',
+  jsonb_build_array(jsonb_build_object(
+    'variant_id', catalog_variant_id,
+    'quantity', 1,
+    'unit_price', 190.00
+  )),
+  'b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2'
+);
+
+select ok(
+  exists (
+    select 1 from public.sale_lines line
+    join public.sale_payments payment on payment.sale_id = line.sale_id
+    where line.sale_id = (select qr_sale_id from test_context)
+      and line.quantity = 1
+      and line.unit_price = 190.00
+      and line.minimum_price_snapshot = 160.00
+      and payment.payment_method = 'qr'
+      and payment.amount = 190.00
+  )
+  and not exists (
+    select 1 from public.cash_movements where sale_id = (select qr_sale_id from test_context)
+  ),
+  'una venta QR guarda precios históricos y no aumenta el efectivo físico'
+);
+
+update test_context
+set cash_sale_id = public.confirm_sale(
+  first_business_id,
+  cash_session_id,
+  'cash',
+  jsonb_build_array(jsonb_build_object(
+    'variant_id', catalog_variant_id,
+    'quantity', 1,
+    'unit_price', 190.00
+  )),
+  'b3b3b3b3-b3b3-4b3b-8b3b-b3b3b3b3b3b3'
+);
+
+select ok(
+  public.confirm_sale(
+    (select first_business_id from test_context),
+    (select cash_session_id from test_context),
+    'cash',
+    jsonb_build_array(jsonb_build_object(
+      'variant_id', (select catalog_variant_id from test_context),
+      'quantity', 1,
+      'unit_price', 190.00
+    )),
+    'b3b3b3b3-b3b3-4b3b-8b3b-b3b3b3b3b3b3'
+  ) = (select cash_sale_id from test_context),
+  'un reintento de venta devuelve la operación existente sin duplicarla'
+);
+
+select ok(
+  (select available_quantity from public.get_inventory_variants((select first_business_id from test_context), null) where variant_id = (select catalog_variant_id from test_context)) = 1
+  and (select count(*) from public.cash_movements where sale_id = (select cash_sale_id from test_context) and amount = 190.00) = 1
+  and (select expected_cash from public.get_open_cash_register_summary((select first_business_id from test_context))) = 240.00
+  and (select qr_sales from public.get_open_cash_register_summary((select first_business_id from test_context))) = 190.00,
+  'la venta en efectivo reduce inventario una vez y aumenta solo el efectivo esperado'
+);
+
+select lives_ok(
+  $$
+    select public.close_cash_register(
+      (select first_business_id from test_context),
+      (select cash_session_id from test_context),
+      240.00,
+      null,
+      'b4b4b4b4-b4b4-4b4b-8b4b-b4b4b4b4b4b4'
+    )
+  $$,
+  'el empleado autorizado puede cerrar la caja con el efectivo esperado'
+);
+
+select ok(
+  exists (
+    select 1 from public.cash_register_sessions
+    where id = (select cash_session_id from test_context)
+      and status = 'closed'
+      and expected_cash = 240.00
+      and counted_cash = 240.00
+      and difference_amount = 0
+  ),
+  'el cierre conserva efectivo esperado, contado y diferencia visible'
+);
+
+select throws_ok(
+  $$
+    select public.confirm_sale(
+      (select first_business_id from test_context),
+      (select cash_session_id from test_context),
+      'cash',
+      jsonb_build_array(jsonb_build_object(
+        'variant_id', (select catalog_variant_id from test_context),
+        'quantity', 1,
+        'unit_price', 190.00
+      )),
+      'b5b5b5b5-b5b5-4b5b-8b5b-b5b5b5b5b5b5'
+    )
+  $$,
+  'P0001',
+  'Debes tener una caja abierta para confirmar la venta.',
+  'no se confirma una venta cuando la caja ya está cerrada'
+);
+
+select set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', true);
 
 select lives_ok(
   $$

@@ -7,7 +7,9 @@ import {
 } from '../features/businesses/services/businessService'
 import { LoginForm } from '../features/auth/components/LoginForm'
 import { CatalogPanel } from '../features/catalog/components/CatalogPanel'
+import { CashRegisterPanel } from '../features/cash-register/components/CashRegisterPanel'
 import { PurchasePanel } from '../features/purchases/components/PurchasePanel'
+import { SalesPanel } from '../features/sales/components/SalesPanel'
 import { MemberManagement } from '../features/users/components/MemberManagement'
 import {
   getPendingBusinessInvitations,
@@ -25,6 +27,7 @@ export function App() {
   const [pendingInvitations, setPendingInvitations] = useState<PendingBusinessInvitation[]>([])
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessMembership | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [cashRefreshToken, setCashRefreshToken] = useState(0)
 
   const loadMemberships = useCallback(async () => {
     try {
@@ -152,6 +155,17 @@ export function App() {
           canManage={selectedBusiness.roleCode === 'owner'}
         />
         <PurchasePanel businessId={selectedBusiness.businessId} canConfirm={selectedBusiness.roleCode === 'owner'} />
+        <CashRegisterPanel
+          businessId={selectedBusiness.businessId}
+          canOpen={selectedBusiness.roleCode === 'owner'}
+          onChanged={() => setCashRefreshToken((currentToken) => currentToken + 1)}
+          refreshToken={cashRefreshToken}
+        />
+        <SalesPanel
+          businessId={selectedBusiness.businessId}
+          onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)}
+          refreshToken={cashRefreshToken}
+        />
         <button className="button" onClick={() => void handleSignOut()} type="button">
           Cerrar sesión
         </button>
