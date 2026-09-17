@@ -30,16 +30,24 @@ Está disponible la base técnica de la aplicación:
 - Ventas confirmadas atómicamente con líneas y precios históricos, pagos por
   efectivo, QR, transferencia o tarjeta, y reducción de inventario una sola
   vez.
+- Consumo FIFO por lote para ventas, salidas autorizadas y ajustes negativos;
+  los ajustes positivos y los cambios sin venta original entran como lotes
+  especiales auditables, no como compras ficticias.
+- Cancelaciones de venta con reversiones inmutables de las asignaciones
+  originales y compensación de efectivo únicamente en una caja abierta.
+- Abonos generales pendientes, confirmación del dueño y aplicación auditable a
+  compras; las cancelaciones directas de compra se bloquean cuando hay
+  consumos, reclasificaciones o abonos aplicados.
+- Conteos, ajustes, salidas autorizadas, productos defectuosos y cambios sin
+  reembolso, todos protegidos por funciones transaccionales del servidor.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para
   acceso cruzado entre negocios.
 
-Los módulos de abonos, ajustes, cambios, salidas y mercadería defectuosa se
-desarrollarán en las fases siguientes. Las existencias no se editan
-directamente: compras y ventas confirmadas son las únicas operaciones de esta
-etapa que las modifican; los prototipos visuales no implican funcionalidades
-implementadas.
+Las existencias nunca se editan directamente. La interfaz actual expone estos
+flujos en paneles operativos mientras se completa la navegación final basada
+en los prototipos.
 
 ## Tecnologías
 

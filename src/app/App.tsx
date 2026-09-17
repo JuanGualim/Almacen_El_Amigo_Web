@@ -11,6 +11,7 @@ import { CashRegisterPanel } from '../features/cash-register/components/CashRegi
 import { PurchasePanel } from '../features/purchases/components/PurchasePanel'
 import { SalesPanel } from '../features/sales/components/SalesPanel'
 import { SaleAuthorizationPanel } from '../features/sales/components/SaleAuthorizationPanel'
+import { OperationsPanel } from '../features/operations/components/OperationsPanel'
 import { MemberManagement } from '../features/users/components/MemberManagement'
 import {
   getPendingBusinessInvitations,
@@ -20,6 +21,7 @@ import { getCurrentSession, signOut } from '../services/auth/authService'
 import { isSupabaseConfigured } from '../services/api/supabaseClient'
 
 type AppState = 'loading' | 'ready' | 'error'
+type ActiveView = 'home' | 'inventory' | 'operations' | 'more' | 'sell'
 
 export function App() {
   const [appState, setAppState] = useState<AppState>('loading')
@@ -29,6 +31,7 @@ export function App() {
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessMembership | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [cashRefreshToken, setCashRefreshToken] = useState(0)
+  const [activeView, setActiveView] = useState<ActiveView>('home')
 
   const loadMemberships = useCallback(async () => {
     try {
@@ -83,6 +86,7 @@ export function App() {
     setMemberships([])
     setPendingInvitations([])
     setSelectedBusiness(null)
+    setActiveView('home')
   }
 
   if (appState === 'loading') {
@@ -134,7 +138,10 @@ export function App() {
           pendingInvitations={pendingInvitations}
           onBusinessCreated={loadMemberships}
           onInvitationAccepted={loadMemberships}
-          onBusinessSelected={setSelectedBusiness}
+          onBusinessSelected={(membership) => {
+            setSelectedBusiness(membership)
+            setActiveView('home')
+          }}
         />
       </main>
     )
@@ -147,27 +154,25 @@ export function App() {
         <p className="muted">
           Negocio activo · {selectedBusiness.roleName} · {selectedBusiness.timezone}
         </p>
-        <p>La base técnica está lista. Los módulos operativos se incorporarán de forma incremental.</p>
-        {selectedBusiness.roleCode === 'owner' ? (
-          <MemberManagement businessId={selectedBusiness.businessId} />
-        ) : null}
-        <CatalogPanel
-          businessId={selectedBusiness.businessId}
-          canManage={selectedBusiness.roleCode === 'owner'}
-        />
-        <PurchasePanel businessId={selectedBusiness.businessId} canConfirm={selectedBusiness.roleCode === 'owner'} />
-        <CashRegisterPanel
-          businessId={selectedBusiness.businessId}
-          canOpen={selectedBusiness.roleCode === 'owner'}
-          onChanged={() => setCashRefreshToken((currentToken) => currentToken + 1)}
-          refreshToken={cashRefreshToken}
-        />
-        <SalesPanel
-          businessId={selectedBusiness.businessId}
-          onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)}
-          refreshToken={cashRefreshToken}
-        />
-        {selectedBusiness.roleCode === 'owner' ? <SaleAuthorizationPanel businessId={selectedBusiness.businessId} /> : null}
+        <nav aria-label="Navegación principal" className="app-navigation">
+          <button className="button button--compact" onClick={() => setActiveView('home')} type="button">Inicio</button>
+          <button className="button button--compact" onClick={() => setActiveView('sell')} type="button">Vender</button>
+          <button className="button button--compact" onClick={() => setActiveView('inventory')} type="button">Inventario</button>
+          <button className="button button--compact" onClick={() => setActiveView('operations')} type="button">Operaciones</button>
+          <button className="button button--compact" onClick={() => setActiveView('more')} type="button">Más</button>
+        </nav>
+        {activeView === 'home' ? <section className="catalog-panel"><h2>Inicio operativo</h2><p className="muted">Usa Vender para registrar una venta, Inventario para consultar catálogo y Operaciones para compras, caja y controles.</p></section> : null}
+        {activeView === 'inventory' ? <CatalogPanel businessId={selectedBusiness.businessId} canManage={selectedBusiness.roleCode === 'owner'} /> : null}
+        {activeView === 'sell' ? <SalesPanel businessId={selectedBusiness.businessId} onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} /> : null}
+        {activeView === 'operations' ? <>
+          <PurchasePanel businessId={selectedBusiness.businessId} canConfirm={selectedBusiness.roleCode === 'owner'} />
+          <CashRegisterPanel businessId={selectedBusiness.businessId} canOpen={selectedBusiness.roleCode === 'owner'} onChanged={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} />
+          <OperationsPanel businessId={selectedBusiness.businessId} isOwner={selectedBusiness.roleCode === 'owner'} />
+        </> : null}
+        {activeView === 'more' ? <>
+          {selectedBusiness.roleCode === 'owner' ? <MemberManagement businessId={selectedBusiness.businessId} /> : null}
+          {selectedBusiness.roleCode === 'owner' ? <SaleAuthorizationPanel businessId={selectedBusiness.businessId} /> : null}
+        </> : null}
         <button className="button" onClick={() => void handleSignOut()} type="button">
           Cerrar sesión
         </button>

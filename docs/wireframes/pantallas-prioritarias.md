@@ -237,11 +237,18 @@
 
 ## Límites de este diseño
 
-- No se define aún el mecanismo del PIN de autorización ni su vigencia.
-- No se resuelve en estos wireframes el valor de un cambio sin venta original,
-  la asignación de abonos generales, ni la política de cancelación. Son
-  decisiones pendientes de la planificación y requieren definición antes de
-  diseñar sus flujos.
+- El PIN de autorización se resuelve en el servidor: seis dígitos, cinco
+  minutos de vigencia, máximo cinco fallos y bloqueo de quince minutos. La
+  pantalla nunca revela ni conserva el PIN.
+- Un cambio sin venta original usa el precio mínimo vigente del producto
+  recibido como valor predeterminado y exige intervención del dueño; el
+  producto entregado debe valer igual o más y nunca genera efectivo ni saldo a
+  favor. La aplicación actual conserva estos flujos en paneles operativos; la
+  navegación final seguirá la estructura móvil propuesta arriba.
+- Los abonos generales impactan el saldo al confirmarse y después pueden
+  aplicarse a compras de forma trazable. Las cancelaciones no borran
+  documentos: ventas revierten asignaciones FIFO y compras solo se cancelan si
+  sus lotes y abonos no tienen dependencias.
 - Los wireframes describen comportamiento y jerarquía de información; colores,
   tipografía, iconografía e identidad visual se decidirán al crear el sistema
   de interfaz.
