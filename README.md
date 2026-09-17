@@ -40,6 +40,9 @@ Está disponible la base técnica de la aplicación:
   consumos, reclasificaciones o abonos aplicados.
 - Conteos, ajustes, salidas autorizadas, productos defectuosos y cambios sin
   reembolso, todos protegidos por funciones transaccionales del servidor.
+- Resoluciones de defectuosos por reemplazo, regreso a disponible, crédito,
+  reembolso o pérdida aceptada; los resultados sin reemplazo requieren al
+  dueño y preservan lote, compra, distribuidor y evidencia opcional.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para

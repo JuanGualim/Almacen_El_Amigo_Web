@@ -22,6 +22,16 @@ rastro de la operación original.
   `defective_pending`; no son una salida definitiva. Los ajustes positivos y
   cambios que no recuperan una asignación original crean lotes especiales sin
   inventar una compra ni un costo.
+- La entrega al distribuidor no cierra el caso: lo mantiene en
+  `delivered_to_supplier`. La resolución es un documento separado e inmutable
+  con motivo, evidencia opcional, solicitante, confirmador, importe y uno de
+  cinco resultados: reemplazo, regreso a disponible, crédito del distribuidor,
+  reembolso o pérdida aceptada. Solo el dueño confirma resultados sin
+  reemplazo.
+- Toda resolución usa los lotes de la reclasificación original. Un regreso a
+  disponible libera el mismo lote; cualquier otra resolución retira ese lote
+  de su estado defectuoso o entregado. El crédito se registra separado de los
+  abonos y puede dejar saldo a favor; el reembolso no mueve la caja de ventas.
 - Los abonos generales se confirman antes de impactar el saldo y sus
   aplicaciones a compras son registros independientes. Una compra confirmada
   solo admite cancelación directa si sus lotes no tienen consumos,

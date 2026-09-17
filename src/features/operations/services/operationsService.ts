@@ -17,7 +17,14 @@ export type SupplierPayment = {
   supplierId: string
   status: 'pending' | 'confirmed'
 }
-export type DefectiveProduct = { id: string; status: 'pending_supplier' | 'delivered' | 'replaced' | 'resolved' }
+export type DefectiveProduct = { id: string; status: 'pending_supplier' | 'delivered_to_supplier' | 'resolved' }
+export type DefectiveResolutionType = 'replacement' | 'returned_to_stock' | 'supplier_credit' | 'supplier_refund' | 'accepted_loss'
+export type DefectiveResolution = {
+  defectiveProductId: string
+  id: string
+  resolutionType: DefectiveResolutionType
+  status: 'pending_confirmation' | 'confirmed'
+}
 
 type InventoryVariantRow = {
   available_quantity: number | string
@@ -37,6 +44,12 @@ type SupplierPaymentRow = {
   supplier_id: string
 }
 type DefectiveProductRow = { id: string; status: DefectiveProduct['status'] }
+type DefectiveResolutionRow = {
+  defective_product_id: string
+  id: string
+  resolution_type: DefectiveResolutionType
+  status: DefectiveResolution['status']
+}
 
 function asError(error: unknown, fallback: string): Error {
   return new Error(error instanceof Error ? error.message : fallback)
@@ -45,6 +58,7 @@ function asError(error: unknown, fallback: string): Error {
 export async function getOperationData(businessId: string, includeOwnerData: boolean): Promise<{
   cashSessions: OpenCashSession[]
   defectiveProducts: DefectiveProduct[]
+  defectiveResolutions: DefectiveResolution[]
   purchases: OperationPurchase[]
   sales: OperationSale[]
   suppliers: OperationSupplier[]
@@ -52,7 +66,7 @@ export async function getOperationData(businessId: string, includeOwnerData: boo
   variants: InventoryOperationVariant[]
 }> {
   const client = getSupabaseClient()
-  const [variantsResult, suppliersResult, sessionsResult, salesResult, purchasesResult, paymentsResult, defectivesResult] = await Promise.all([
+  const [variantsResult, suppliersResult, sessionsResult, salesResult, purchasesResult, paymentsResult, defectivesResult, resolutionsResult] = await Promise.all([
     client.rpc('get_inventory_variants', { p_business_id: businessId, p_query: null }),
     client.from('suppliers').select('id, name').eq('business_id', businessId).eq('is_active', true).order('name'),
     client.from('cash_register_sessions').select('id, business_date').eq('business_id', businessId).eq('status', 'open'),
@@ -63,16 +77,23 @@ export async function getOperationData(businessId: string, includeOwnerData: boo
       ? client.from('purchases').select('id, purchase_number, total_amount').eq('business_id', businessId).eq('status', 'confirmed').order('confirmed_at', { ascending: false }).limit(30)
       : Promise.resolve({ data: [], error: null }),
     client.from('supplier_payments').select('id, supplier_id, amount, status').eq('business_id', businessId).order('registered_at', { ascending: false }).limit(30),
-    client.from('defective_products').select('id, status').eq('business_id', businessId).in('status', ['pending_supplier', 'delivered']).order('reported_at', { ascending: false }).limit(30),
+    client.from('defective_products').select('id, status').eq('business_id', businessId).in('status', ['pending_supplier', 'delivered_to_supplier']).order('reported_at', { ascending: false }).limit(30),
+    client.from('defective_product_resolutions').select('id, defective_product_id, resolution_type, status').eq('business_id', businessId).eq('status', 'pending_confirmation').order('recorded_at', { ascending: false }).limit(30),
   ])
 
-  for (const result of [variantsResult, suppliersResult, sessionsResult, salesResult, purchasesResult, paymentsResult, defectivesResult]) {
+  for (const result of [variantsResult, suppliersResult, sessionsResult, salesResult, purchasesResult, paymentsResult, defectivesResult, resolutionsResult]) {
     if (result.error) throw asError(result.error, 'No fue posible cargar las operaciones.')
   }
 
   return {
     cashSessions: ((sessionsResult.data ?? []) as CashSessionRow[]).map((row) => ({ id: row.id, businessDate: row.business_date })),
     defectiveProducts: (defectivesResult.data ?? []) as DefectiveProductRow[],
+    defectiveResolutions: ((resolutionsResult.data ?? []) as DefectiveResolutionRow[]).map((row) => ({
+      defectiveProductId: row.defective_product_id,
+      id: row.id,
+      resolutionType: row.resolution_type,
+      status: row.status,
+    })),
     purchases: ((purchasesResult.data ?? []) as PurchaseRow[]).map((row) => ({
       id: row.id, purchaseNumber: row.purchase_number, totalAmount: parseGTQ(String(row.total_amount)),
     })),
@@ -162,11 +183,29 @@ export async function deliverDefectiveProduct(businessId: string, defectiveProdu
   if (error) throw asError(error, 'No fue posible registrar la entrega al distribuidor.')
 }
 
-export async function replaceDefectiveProduct(businessId: string, defectiveProductId: string): Promise<void> {
-  const { error } = await getSupabaseClient().rpc('replace_defective_product', {
-    p_business_id: businessId, p_defective_product_id: defectiveProductId, p_request_id: crypto.randomUUID(),
+export async function recordDefectiveResolution(
+  businessId: string,
+  defectiveProductId: string,
+  supplierId: string,
+  resolutionType: DefectiveResolutionType,
+  reason: string,
+  amount: Money | null,
+  evidencePath: string,
+): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('record_defective_product_resolution', {
+    p_amount: amount === null ? null : serializeGTQ(amount), p_business_id: businessId,
+    p_defective_product_id: defectiveProductId, p_evidence_path: evidencePath.trim() || null,
+    p_reason: reason, p_request_id: crypto.randomUUID(), p_resolution_type: resolutionType,
+    p_supplier_id: supplierId || null,
   })
-  if (error) throw asError(error, 'No fue posible registrar el reemplazo.')
+  if (error) throw asError(error, 'No fue posible registrar la resolución.')
+}
+
+export async function confirmDefectiveResolution(businessId: string, resolutionId: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('confirm_defective_product_resolution', {
+    p_business_id: businessId, p_request_id: crypto.randomUUID(), p_resolution_id: resolutionId,
+  })
+  if (error) throw asError(error, 'No fue posible confirmar la resolución.')
 }
 
 export async function cancelSale(businessId: string, saleId: string, cashSessionId: string, reason: string): Promise<void> {

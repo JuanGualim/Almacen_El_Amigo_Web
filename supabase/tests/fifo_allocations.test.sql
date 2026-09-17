@@ -1,6 +1,6 @@
 begin;
 
-select plan(26);
+select plan(27);
 
 insert into auth.users (
   id, instance_id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -314,17 +314,27 @@ select lives_ok(
 
 select is(
   (select status::text from public.defective_products where request_id = '30000000-0000-4000-8000-000000000007'),
-  'delivered',
+  'delivered_to_supplier',
   'la entrega conserva el defectuoso en estado entregado'
 );
 
 select lives_ok(
-  $$ select public.replace_defective_product(
+  $$ select public.record_defective_product_resolution(
     (select business_id from fifo_context),
     (select id from public.defective_products where request_id = '30000000-0000-4000-8000-000000000007'),
+    (select supplier_id from fifo_context), 'replacement', 'El distribuidor entregó reemplazo', null, null,
     '30000000-0000-4000-8000-000000000032'
   ) $$,
-  'el reemplazo entra como lote especial disponible y auditable'
+  'el reemplazo se registra como una resolución independiente'
+);
+
+select lives_ok(
+  $$ select public.confirm_defective_product_resolution(
+    (select business_id from fifo_context),
+    (select id from public.defective_product_resolutions where request_id = '30000000-0000-4000-8000-000000000032'),
+    '30000000-0000-4000-8000-000000000033'
+  ) $$,
+  'el reemplazo confirmado entra como lote especial y auditable'
 );
 
 select * from finish();

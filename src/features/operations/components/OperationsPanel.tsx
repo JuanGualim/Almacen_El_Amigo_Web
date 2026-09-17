@@ -4,16 +4,19 @@ import {
   applySupplierPayment,
   cancelPurchase,
   cancelSale,
+  confirmDefectiveResolution,
   confirmSupplierPayment,
   deliverDefectiveProduct,
   getOperationData,
   recordAuthorizedExit,
+  recordDefectiveResolution,
   recordInventoryCount,
   recordProductExchange,
   recordSupplierPayment,
   reportDefectiveProduct,
-  replaceDefectiveProduct,
   type DefectiveProduct,
+  type DefectiveResolution,
+  type DefectiveResolutionType,
   type OpenCashSession,
   type OperationPurchase,
   type OperationSale,
@@ -39,6 +42,7 @@ export function OperationsPanel({ businessId, isOwner }: OperationsPanelProps) {
   const [purchases, setPurchases] = useState<OperationPurchase[]>([])
   const [payments, setPayments] = useState<SupplierPayment[]>([])
   const [defectiveProducts, setDefectiveProducts] = useState<DefectiveProduct[]>([])
+  const [defectiveResolutions, setDefectiveResolutions] = useState<DefectiveResolution[]>([])
   const [message, setMessage] = useState<string | null>(null)
   const [paymentSupplierId, setPaymentSupplierId] = useState('')
   const [paymentAmount, setPaymentAmount] = useState('')
@@ -51,6 +55,12 @@ export function OperationsPanel({ businessId, isOwner }: OperationsPanelProps) {
   const [defectiveSupplierId, setDefectiveSupplierId] = useState('')
   const [defectiveQuantity, setDefectiveQuantity] = useState('1')
   const [defectiveDescription, setDefectiveDescription] = useState('')
+  const [resolutionDefectiveId, setResolutionDefectiveId] = useState('')
+  const [resolutionSupplierId, setResolutionSupplierId] = useState('')
+  const [resolutionType, setResolutionType] = useState<DefectiveResolutionType>('replacement')
+  const [resolutionReason, setResolutionReason] = useState('')
+  const [resolutionAmount, setResolutionAmount] = useState('')
+  const [resolutionEvidencePath, setResolutionEvidencePath] = useState('')
   const [exitVariantId, setExitVariantId] = useState('')
   const [exitQuantity, setExitQuantity] = useState('1')
   const [exitReason, setExitReason] = useState('')
@@ -77,6 +87,7 @@ export function OperationsPanel({ businessId, isOwner }: OperationsPanelProps) {
       setSuppliers(data.suppliers)
       setSessions(data.cashSessions)
       setDefectiveProducts(data.defectiveProducts)
+      setDefectiveResolutions(data.defectiveResolutions)
       setSales(data.sales)
       setPurchases(data.purchases)
       setPayments(data.supplierPayments)
@@ -141,6 +152,21 @@ export function OperationsPanel({ businessId, isOwner }: OperationsPanelProps) {
     }, 'Salida autorizada registrada con consumo FIFO.')
   }
 
+  function handleDefectiveResolution(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    void submit(async () => {
+      if (!resolutionDefectiveId) throw new Error('Selecciona un producto defectuoso.')
+      const needsAmount = resolutionType === 'supplier_credit' || resolutionType === 'supplier_refund'
+      await recordDefectiveResolution(
+        businessId, resolutionDefectiveId, resolutionSupplierId, resolutionType,
+        resolutionReason, needsAmount ? parseGTQ(resolutionAmount) : null, resolutionEvidencePath,
+      )
+      setResolutionReason('')
+      setResolutionAmount('')
+      setResolutionEvidencePath('')
+    }, 'Resolución registrada. Las resoluciones sin reemplazo requieren confirmación del dueño.')
+  }
+
   function handleExchange(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     void submit(async () => {
@@ -190,10 +216,29 @@ export function OperationsPanel({ businessId, isOwner }: OperationsPanelProps) {
     {isOwner && defectiveProducts.length > 0 ? <section className="catalog-form" aria-labelledby="defective-follow-up-title">
       <h3 id="defective-follow-up-title">Seguimiento de defectuosos</h3>
       <ul className="price-history-list">{defectiveProducts.map((defective) => <li key={defective.id}>
-        <span>{defective.status === 'pending_supplier' ? 'Pendiente de entrega al distribuidor' : 'Entregado; pendiente de reemplazo'}</span>
+        <span>{defective.status === 'pending_supplier' ? 'Pendiente de entrega al distribuidor' : 'Entregado al distribuidor; pendiente de acuerdo final'}</span>
         {defective.status === 'pending_supplier'
           ? <button className="button button--compact" type="button" onClick={() => void submit(() => deliverDefectiveProduct(businessId, defective.id), 'Defectuoso entregado al distribuidor con sus lotes trazados.')}>Entregar</button>
-          : <button className="button button--compact" type="button" onClick={() => void submit(() => replaceDefectiveProduct(businessId, defective.id), 'Reemplazo registrado como una entrada especial auditable.')}>Registrar reemplazo</button>}
+          : null}
+      </li>)}</ul>
+    </section> : null}
+
+    {defectiveProducts.length > 0 ? <form className="catalog-form" onSubmit={handleDefectiveResolution}>
+      <h3>Registrar resolución de defectuoso</h3>
+      <label className="field">Producto defectuoso<select value={resolutionDefectiveId} onChange={(event) => setResolutionDefectiveId(event.target.value)} required><option value="">Selecciona</option>{defectiveProducts.map((defective) => <option key={defective.id} value={defective.id}>{defective.status === 'pending_supplier' ? 'Pendiente de entrega' : 'Entregado al distribuidor'}</option>)}</select></label>
+      <label className="field">Tipo<select value={resolutionType} onChange={(event) => setResolutionType(event.target.value as DefectiveResolutionType)}><option value="replacement">Reemplazo</option><option value="returned_to_stock">Regresa a disponible</option><option value="supplier_credit">Crédito del distribuidor</option><option value="supplier_refund">Reembolso del distribuidor</option><option value="accepted_loss">Pérdida o desecho aceptado</option></select></label>
+      <label className="field">Distribuidor{resolutionType === 'supplier_credit' || resolutionType === 'supplier_refund' ? ' (obligatorio)' : ' (opcional)'}<select value={resolutionSupplierId} onChange={(event) => setResolutionSupplierId(event.target.value)} required={resolutionType === 'supplier_credit' || resolutionType === 'supplier_refund'}><option value="">Selecciona</option>{suppliers.map((supplier) => <option key={supplier.id} value={supplier.id}>{supplier.name}</option>)}</select></label>
+      {resolutionType === 'supplier_credit' || resolutionType === 'supplier_refund' ? <label className="field">Importe<input inputMode="decimal" value={resolutionAmount} onChange={(event) => setResolutionAmount(event.target.value)} required /></label> : null}
+      <label className="field">Motivo<input value={resolutionReason} onChange={(event) => setResolutionReason(event.target.value)} minLength={3} maxLength={500} required /></label>
+      <label className="field">Ruta de evidencia (opcional)<input value={resolutionEvidencePath} onChange={(event) => setResolutionEvidencePath(event.target.value)} maxLength={500} /></label>
+      <button className="button">Registrar resolución</button>
+    </form> : null}
+
+    {defectiveResolutions.length > 0 ? <section className="catalog-form" aria-labelledby="resolution-confirmation-title">
+      <h3 id="resolution-confirmation-title">Resoluciones pendientes</h3>
+      <ul className="price-history-list">{defectiveResolutions.map((resolution) => <li key={resolution.id}>
+        <span>{resolution.resolutionType.replaceAll('_', ' ')}</span>
+        {isOwner || resolution.resolutionType === 'replacement' ? <button className="button button--compact" type="button" onClick={() => void submit(() => confirmDefectiveResolution(businessId, resolution.id), 'Resolución confirmada con movimientos por lote y auditoría completa.')}>Confirmar resolución</button> : <span className="muted">Pendiente de confirmación del dueño</span>}
       </li>)}</ul>
     </section> : null}
 
