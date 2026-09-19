@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { formatGTQ } from '../../../domain/money/money'
 import { getOperationalReport, type OperationalReport } from '../services/reportService'
+import { createAndDownloadManualBackup, downloadReportCsv, downloadStructuredExport } from '../services/exportService'
 
 type ReportsPanelProps = { businessId: string; timezone: string }
 
@@ -27,6 +28,7 @@ export function ReportsPanel({ businessId, timezone }: ReportsPanelProps) {
   const [report, setReport] = useState<OperationalReport | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   async function loadReport(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -43,6 +45,12 @@ export function ReportsPanel({ businessId, timezone }: ReportsPanelProps) {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  async function generateExport(action: () => Promise<void>) {
+    setIsExporting(true); setErrorMessage(null)
+    try { await action() } catch (error) { setErrorMessage(error instanceof Error ? error.message : 'No fue posible generar la descarga.') }
+    finally { setIsExporting(false) }
   }
 
   return <section className="catalog-panel reports-panel" aria-labelledby="reports-title">
@@ -73,8 +81,13 @@ export function ReportsPanel({ businessId, timezone }: ReportsPanelProps) {
       <ReportList title="Compras por distribuidor" emptyMessage="No hay compras confirmadas en el periodo.">
         {report.purchasesBySupplier.map((item) => <li key={item.supplierName}><span>{item.supplierName} · {item.purchasesCount} compra(s)</span><strong>{formatGTQ(item.purchasesAmount)}</strong></li>)}
       </ReportList>
-      <p className="muted">La descarga y frecuencia de exportaciones se habilitarán cuando se apruebe su formato y política de respaldo.</p>
+      <div className="dashboard-actions"><button className="button button--compact" type="button" onClick={() => downloadReportCsv(report, startDate, endDate)}>Descargar CSV</button></div>
     </>}
+    <section className="report-list" aria-label="Exportación y respaldo">
+      <h3>Exportación y respaldo</h3>
+      <p className="muted">El CSV y el JSON facilitan consulta o traslado; no sustituyen un respaldo técnico. Mantén una copia independiente fuera del proyecto.</p>
+      <div className="dashboard-actions"><button className="button button--compact" disabled={isExporting} type="button" onClick={() => void generateExport(() => downloadStructuredExport(businessId))}>Descargar JSON estructurado</button><button className="button button--compact" disabled={isExporting} type="button" onClick={() => void generateExport(() => createAndDownloadManualBackup(businessId))}>Generar respaldo manual</button></div>
+    </section>
   </section>
 }
 

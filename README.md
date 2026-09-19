@@ -48,6 +48,14 @@ Está disponible la base técnica de la aplicación:
 - Reportes sensibles para usuarios autorizados, con periodos calculados en la
   zona horaria del negocio: ventas, pagos, variantes más vendidas, compras,
   caja y saldo derivado con distribuidores.
+- Alertas de agotado y stock bajo por variante, con límite predeterminado de
+  dos unidades, configuración del dueño y agrupación por producto.
+- Borradores y ventas ordinarias pendientes por usuario y negocio durante una
+  interrupción; el servidor las valida al sincronizar y conserva conflictos
+  para el dueño.
+- Descarga CSV de reportes, JSON estructurado y respaldo manual con manifiesto
+  y checksum SHA-256. Hay instantáneas privadas diarias con retención; siguen
+  pendientes la restauración aislada y una copia binaria externa de adjuntos.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para

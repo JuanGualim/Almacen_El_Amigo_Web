@@ -2,17 +2,19 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { formatCatalogAttributes } from '../../../domain/catalog/attributes'
 import { addMoney, formatGTQ, multiplyMoney, parseGTQ, serializeGTQ, type Money } from '../../../domain/money/money'
 import { getOpenCashRegisterSummary, type CashRegisterSummary } from '../../cash-register/services/cashRegisterService'
-import { confirmSale, confirmSaleWithPriceAuthorization, getSellableVariants, requestSalePriceAuthorization, type SaleLineInput, type SalePaymentMethod, type SellableVariant } from '../services/salesService'
+import { clearOfflineSaleDraft, getCachedSalesSnapshot, getOfflineSaleDraft, getOfflineSales, saveOfflineSale, saveOfflineSaleDraft, updateOfflineSale, cacheSalesSnapshot, type OfflineSale } from '../services/offlineSalesService'
+import { confirmSale, confirmSaleWithPriceAuthorization, getSellableVariants, recordOfflineSaleSyncConflict, requestSalePriceAuthorization, type SaleLineInput, type SalePaymentMethod, type SellableVariant } from '../services/salesService'
 
 type SalesPanelProps = {
   businessId: string
   onSaleConfirmed: () => void
   refreshToken: number
+  userId: string
 }
 
 type CartLine = SaleLineInput & { description: string; minimumPrice: Money }
 
-export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesPanelProps) {
+export function SalesPanel({ businessId, onSaleConfirmed, refreshToken, userId }: SalesPanelProps) {
   const [cashSummary, setCashSummary] = useState<CashRegisterSummary | null>(null)
   const [variants, setVariants] = useState<SellableVariant[]>([])
   const [variantId, setVariantId] = useState('')
@@ -24,6 +26,7 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
   const [authorizationId, setAuthorizationId] = useState<string | null>(null)
   const [authorizationReason, setAuthorizationReason] = useState('')
   const [message, setMessage] = useState<string | null>(null)
+  const [offlineSales, setOfflineSales] = useState<OfflineSale[]>([])
 
   const load = useCallback(async () => {
     try {
@@ -33,15 +36,44 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
       ])
       setCashSummary(nextSummary)
       setVariants(nextVariants)
+      await cacheSalesSnapshot(userId, businessId, { cashSummary: nextSummary, variants: nextVariants })
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'No fue posible cargar la venta.')
+      const cached = await getCachedSalesSnapshot(userId, businessId)
+      if (!cached) {
+        setMessage(error instanceof Error ? error.message : 'No fue posible cargar la venta.')
+        return
+      }
+      setCashSummary(cached.cashSummary)
+      setVariants(cached.variants)
+      setMessage('Sin conexión: se muestran los datos guardados localmente. Una venta seguirá pendiente hasta que el servidor la confirme.')
     }
-  }, [businessId])
+  }, [businessId, userId])
+
+  const loadOfflineSales = useCallback(async () => {
+    try {
+      setOfflineSales(await getOfflineSales(userId, businessId))
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No fue posible cargar las ventas locales.')
+    }
+  }, [businessId, userId])
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => void load(), 0)
     return () => window.clearTimeout(timeoutId)
   }, [load, refreshToken])
+
+  useEffect(() => {
+    const timer = window.setTimeout(async () => {
+      const draft = await getOfflineSaleDraft(userId, businessId)
+      if (draft && draft.lines.length > 0) {
+        setLines(draft.lines)
+        setPaymentMethod(draft.paymentMethod)
+        setMessage('Se restauró un borrador local. Revísalo antes de enviarlo.')
+      }
+      await loadOfflineSales()
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [businessId, loadOfflineSales, userId])
 
   const total = useMemo(
     () => addMoney(...lines.map((line) => multiplyMoney(line.unitPrice, line.quantity))),
@@ -88,6 +120,21 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
       if (!cashSummary) throw new Error('No hay caja abierta para confirmar la venta.')
       if (lines.length === 0) throw new Error('Agrega al menos una línea al carrito.')
       const requiresAuthorization = lines.some((line) => line.unitPrice < line.minimumPrice)
+      if (!navigator.onLine) {
+        if (requiresAuthorization || authorizationId) throw new Error('Una venta que requiere autorización no puede encolarse sin conexión.')
+        const queuedSale: OfflineSale = {
+          businessId, cashSessionId: cashSummary.cashSessionId, createdAt: new Date().toISOString(), errorMessage: null,
+          lines: lines.map(({ quantity: lineQuantity, unitPrice: lineUnitPrice, variantId: lineVariantId }) => ({ quantity: lineQuantity, unitPrice: lineUnitPrice, variantId: lineVariantId })),
+          paymentMethod, requestId, status: 'pending', userId,
+        }
+        await saveOfflineSale(queuedSale)
+        await clearOfflineSaleDraft(userId, businessId)
+        setLines([])
+        setRequestId(crypto.randomUUID())
+        setMessage('Venta guardada como pendiente de sincronización. El servidor validará caja, permisos, precio y existencia al reconectar.')
+        await loadOfflineSales()
+        return
+      }
       if (requiresAuthorization && !authorizationId) {
         const id = await requestSalePriceAuthorization(businessId, lines, authorizationReason, requestId)
         setAuthorizationId(id)
@@ -102,12 +149,55 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
       setRequestId(crypto.randomUUID())
       setAuthorizationId(null)
       setAuthorizationReason('')
+      await clearOfflineSaleDraft(userId, businessId)
       setMessage(`Venta ${saleId.slice(0, 8)} confirmada. Inventario y caja actualizados.`)
       await load()
       onSaleConfirmed()
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No fue posible confirmar la venta.')
     }
+  }
+
+  async function handleSaveDraft() {
+    setMessage(null)
+    try {
+      if (lines.length === 0) throw new Error('Agrega al menos una línea antes de guardar el borrador.')
+      await saveOfflineSaleDraft(userId, businessId, { lines, paymentMethod })
+      setMessage('Borrador guardado solo en este dispositivo y para este usuario.')
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No fue posible guardar el borrador.')
+    }
+  }
+
+  async function synchronizeOfflineSales() {
+    if (!navigator.onLine) {
+      setMessage('No hay conexión para sincronizar ventas pendientes.')
+      return
+    }
+    const pendingSales = await getOfflineSales(userId, businessId)
+    for (const sale of pendingSales.filter((item) => item.status === 'pending')) {
+      await updateOfflineSale({ ...sale, status: 'syncing', errorMessage: null })
+      try {
+        await confirmSale(sale.businessId, sale.cashSessionId, sale.paymentMethod, sale.lines, sale.requestId)
+        await updateOfflineSale({ ...sale, status: 'confirmed', errorMessage: null })
+        onSaleConfirmed()
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'El servidor rechazó la venta pendiente.'
+        if (!navigator.onLine) {
+          await updateOfflineSale({ ...sale, status: 'pending', errorMessage: null })
+          break
+        }
+        try {
+          await recordOfflineSaleSyncConflict(sale.businessId, sale.cashSessionId, sale.paymentMethod, sale.lines, errorMessage, sale.requestId)
+        } catch {
+          // El conflicto local se conserva aunque el servidor no pueda recibirlo todavía.
+        }
+        await updateOfflineSale({ ...sale, status: 'conflict', errorMessage })
+      }
+    }
+    await loadOfflineSales()
+    await load()
+    setMessage('Sincronización terminada. Las ventas en conflicto requieren revisión del dueño.')
   }
 
   return <section className="catalog-panel" aria-labelledby="sales-title">
@@ -120,8 +210,14 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken }: SalesP
       <p><strong>Total: {formatGTQ(total)}</strong></p>
       {lines.some((line) => line.unitPrice < line.minimumPrice) ? <label className="field">Motivo para precio bajo mínimo<textarea value={authorizationReason} onChange={(event) => setAuthorizationReason(event.target.value)} required maxLength={300} /></label> : null}
       <label className="field">Forma de pago<select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value as SalePaymentMethod)}><option value="cash">Efectivo</option><option value="qr">QR bancario</option><option value="transfer">Transferencia</option><option value="card">Tarjeta</option></select></label>
+      <button className="button button--compact" type="button" onClick={() => void handleSaveDraft()}>Guardar borrador local</button>
       <button className="button">Confirmar venta</button>
     </form>}
+    {offlineSales.length > 0 ? <section className="catalog-form" aria-label="Ventas guardadas localmente">
+      <h3>Ventas locales</h3>
+      <ul className="price-history-list">{offlineSales.map((sale) => <li key={sale.requestId}><span>{sale.status === 'pending' ? 'Pendiente de sincronización' : sale.status === 'syncing' ? 'Sincronizando' : sale.status === 'confirmed' ? 'Confirmada por el servidor' : 'En conflicto; requiere dueño'}</span>{sale.errorMessage ? <span className="muted">{sale.errorMessage}</span> : null}</li>)}</ul>
+      {offlineSales.some((sale) => sale.status === 'pending') ? <button className="button button--compact" type="button" onClick={() => void synchronizeOfflineSales()}>Sincronizar ventas pendientes</button> : null}
+    </section> : null}
     {message ? <p className="notice" role="status">{message}</p> : null}
   </section>
 }

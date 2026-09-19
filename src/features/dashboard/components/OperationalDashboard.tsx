@@ -4,15 +4,18 @@ import {
   getOperationalDashboard,
   type OperationalDashboard as OperationalDashboardData,
 } from '../services/dashboardService'
+import { InventoryAlertsPanel } from '../../inventory/components/InventoryAlertsPanel'
+import { OfflineSaleConflictsPanel } from '../../sales/components/OfflineSaleConflictsPanel'
 
 type OperationalDashboardProps = {
   businessId: string
+  isOwner: boolean
   onNavigate: (view: 'operations' | 'sell') => void
 }
 
 type PendingItem = { label: string; value: number | null }
 
-export function OperationalDashboard({ businessId, onNavigate }: OperationalDashboardProps) {
+export function OperationalDashboard({ businessId, isOwner, onNavigate }: OperationalDashboardProps) {
   const [dashboard, setDashboard] = useState<OperationalDashboardData | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -88,6 +91,8 @@ export function OperationalDashboard({ businessId, onNavigate }: OperationalDash
         {pendingItems.map((item) => <li key={item.label}><span>{item.label}</span><strong>{item.value}</strong></li>)}
       </ul>}
     </section>
+    <InventoryAlertsPanel businessId={businessId} />
+    {isOwner ? <OfflineSaleConflictsPanel businessId={businessId} /> : null}
 
     <div className="dashboard-actions">
       <button className="button button--compact" type="button" onClick={() => onNavigate('sell')}>Registrar venta</button>

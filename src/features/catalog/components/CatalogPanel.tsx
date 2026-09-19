@@ -11,6 +11,7 @@ import {
   type CatalogVariant,
   type VariantPriceHistoryEntry,
 } from '../services/catalogService'
+import { getVariantStockAlert, setVariantStockAlert } from '../../inventory/services/inventoryAlertsService'
 
 type CatalogPanelProps = {
   businessId: string
@@ -51,6 +52,8 @@ export function CatalogPanel({ businessId, canManage }: CatalogPanelProps) {
   const [priceSuggested, setPriceSuggested] = useState('')
   const [priceMinimum, setPriceMinimum] = useState('')
   const [priceReason, setPriceReason] = useState('')
+  const [stockAlertThreshold, setStockAlertThreshold] = useState('2')
+  const [stockAlertEnabled, setStockAlertEnabled] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -84,6 +87,7 @@ export function CatalogPanel({ businessId, canManage }: CatalogPanelProps) {
     setPriceSuggested(variant.suggestedPrice !== null ? String(variant.suggestedPrice / 100) : '')
     setPriceMinimum(variant.minimumPrice !== null ? String(variant.minimumPrice / 100) : '')
     setPriceReason('')
+    void loadStockAlert(variant.variantId)
     setPriceHistory([])
     setErrorMessage(null)
     setSuccessMessage(null)
@@ -99,6 +103,16 @@ export function CatalogPanel({ businessId, canManage }: CatalogPanelProps) {
       setErrorMessage(toErrorMessage(error, 'No fue posible cargar el historial de precios.'))
     } finally {
       setIsLoadingPriceHistory(false)
+    }
+  }
+
+  async function loadStockAlert(variantId: string) {
+    try {
+      const setting = await getVariantStockAlert(businessId, variantId)
+      setStockAlertThreshold(String(setting.threshold))
+      setStockAlertEnabled(setting.isEnabled)
+    } catch (error) {
+      setErrorMessage(toErrorMessage(error, 'No fue posible cargar la alerta de existencias.'))
     }
   }
 
@@ -190,6 +204,23 @@ export function CatalogPanel({ businessId, canManage }: CatalogPanelProps) {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  async function handleSaveStockAlert(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!selectedVariant) return
+    const threshold = Number(stockAlertThreshold)
+    if (!Number.isSafeInteger(threshold) || threshold < 1) {
+      setErrorMessage('El límite de stock bajo debe ser un entero de al menos una unidad.')
+      return
+    }
+    setIsSubmitting(true)
+    try {
+      await setVariantStockAlert(businessId, selectedVariant.variantId, threshold, stockAlertEnabled)
+      setSuccessMessage(stockAlertEnabled ? 'Alerta de existencias actualizada.' : 'Alerta de existencias desactivada para esta variante.')
+    } catch (error) {
+      setErrorMessage(toErrorMessage(error, 'No fue posible actualizar la alerta.'))
+    } finally { setIsSubmitting(false) }
   }
 
   return (
@@ -394,6 +425,20 @@ export function CatalogPanel({ businessId, canManage }: CatalogPanelProps) {
             <button className="button button--compact" disabled={isSubmitting} type="submit">
               Actualizar precios
             </button>
+          </form>
+
+          <form className="catalog-form" onSubmit={handleSaveStockAlert}>
+            <h4>Alerta de existencias</h4>
+            <label className="field" htmlFor="stock-alert-threshold">
+              Límite de stock bajo
+              <input id="stock-alert-threshold" inputMode="numeric" min="1" value={stockAlertThreshold} onChange={(event) => setStockAlertThreshold(event.target.value)} disabled={!stockAlertEnabled} required />
+            </label>
+            <label className="field" htmlFor="stock-alert-enabled">
+              <input id="stock-alert-enabled" type="checkbox" checked={stockAlertEnabled} onChange={(event) => setStockAlertEnabled(event.target.checked)} />
+              Mostrar alerta para esta variante
+            </label>
+            <p className="muted">Predeterminado: 2 unidades. Agotada es 0; stock bajo es entre 1 y el límite.</p>
+            <button className="button button--compact" disabled={isSubmitting} type="submit">Guardar alerta</button>
           </form>
         </section>
       ) : null}

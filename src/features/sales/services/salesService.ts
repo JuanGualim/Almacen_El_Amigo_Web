@@ -81,6 +81,29 @@ export async function confirmSale(
   return data
 }
 
+export async function recordOfflineSaleSyncConflict(
+  businessId: string,
+  cashSessionId: string,
+  paymentMethod: SalePaymentMethod,
+  lines: readonly SaleLineInput[],
+  errorMessage: string,
+  requestId: string,
+): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('record_offline_sale_sync_conflict', {
+    p_business_id: businessId,
+    p_cash_session_id: cashSessionId,
+    p_error_message: errorMessage,
+    p_payment_method: paymentMethod,
+    p_request_id: requestId,
+    p_sale_lines: lines.map((line) => ({
+      quantity: line.quantity,
+      unit_price: serializeGTQ(line.unitPrice),
+      variant_id: line.variantId,
+    })),
+  })
+  if (error) throw new Error('No fue posible conservar el conflicto de sincronización.')
+}
+
 export async function requestSalePriceAuthorization(businessId: string, lines: readonly SaleLineInput[], reason: string, requestId: string): Promise<string> {
   const { data, error } = await getSupabaseClient().rpc('request_sale_price_authorization', {
     p_business_id: businessId,

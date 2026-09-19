@@ -21,6 +21,7 @@ import {
   type PendingBusinessInvitation,
 } from '../features/users/services/memberService'
 import { getCurrentSession, signOut } from '../services/auth/authService'
+import { clearOfflineDataForUser } from '../features/sales/services/offlineSalesService'
 import { isSupabaseConfigured } from '../services/api/supabaseClient'
 
 type AppState = 'loading' | 'ready' | 'error'
@@ -84,6 +85,7 @@ export function App() {
   }
 
   async function handleSignOut() {
+    if (session) await clearOfflineDataForUser(session.user.id)
     await signOut()
     setSession(null)
     setMemberships([])
@@ -165,9 +167,9 @@ export function App() {
           <button className="button button--compact" onClick={() => setActiveView('operations')} type="button">Operaciones</button>
           <button className="button button--compact" onClick={() => setActiveView('more')} type="button">Más</button>
         </nav>
-        {activeView === 'home' ? <OperationalDashboard businessId={selectedBusiness.businessId} onNavigate={setActiveView} /> : null}
+        {activeView === 'home' ? <OperationalDashboard businessId={selectedBusiness.businessId} isOwner={selectedBusiness.roleCode === 'owner'} onNavigate={setActiveView} /> : null}
         {activeView === 'inventory' ? <CatalogPanel businessId={selectedBusiness.businessId} canManage={selectedBusiness.roleCode === 'owner'} /> : null}
-        {activeView === 'sell' ? <SalesPanel businessId={selectedBusiness.businessId} onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} /> : null}
+        {activeView === 'sell' ? <SalesPanel businessId={selectedBusiness.businessId} onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} userId={session.user.id} /> : null}
         {activeView === 'operations' ? <>
           <PurchasePanel businessId={selectedBusiness.businessId} canConfirm={selectedBusiness.roleCode === 'owner'} />
           <CashRegisterPanel businessId={selectedBusiness.businessId} canOpen={selectedBusiness.roleCode === 'owner'} onChanged={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} />
