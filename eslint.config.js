@@ -10,6 +10,22 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ['scripts/**/*.mjs', 'src/**/*.test.mjs', 'supabase/functions/**/*.{ts,mjs}'],
+    languageOptions: {
+      globals: {
+        Deno: 'readonly',
+        Headers: 'readonly',
+        TextDecoder: 'readonly',
+        TextEncoder: 'readonly',
+        URL: 'readonly',
+        crypto: 'readonly',
+        fetch: 'readonly',
+        process: 'readonly',
+        Response: 'readonly',
+      },
+    },
+  },
+  {
     files: ['src/**/*.{ts,tsx}'],
     plugins: {
       'react-hooks': reactHooks,

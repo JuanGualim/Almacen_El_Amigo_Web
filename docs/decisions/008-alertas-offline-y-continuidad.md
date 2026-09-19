@@ -18,7 +18,6 @@
 
 ## Consecuencia pendiente
 
-La instantánea registra el manifiesto de archivos, pero aún no duplica el
-binario de cada adjunto a un almacenamiento de respaldo independiente. Una
-restauración completa debe ensayarse en una base aislada antes de usar el
-sistema como fuente oficial.
+La copia externa S3 compatible y el restaurador aislado se especifican en la
+ADR 009. Falta ejecutar y documentar un ensayo real con un bucket de prueba;
+hasta entonces la aplicación no es fuente oficial.

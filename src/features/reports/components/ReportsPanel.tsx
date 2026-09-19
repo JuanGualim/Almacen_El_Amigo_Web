@@ -1,7 +1,7 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { formatGTQ } from '../../../domain/money/money'
 import { getOperationalReport, type OperationalReport } from '../services/reportService'
-import { createAndDownloadManualBackup, downloadReportCsv, downloadStructuredExport } from '../services/exportService'
+import { createAndDownloadManualBackup, downloadReportCsv, downloadStructuredExport, getLatestExternalBackupJob, processExternalBackupJob, retryExternalBackupJob, startExternalBackup, type ExternalBackupJob } from '../services/exportService'
 
 type ReportsPanelProps = { businessId: string; timezone: string }
 
@@ -29,6 +29,22 @@ export function ReportsPanel({ businessId, timezone }: ReportsPanelProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [backupMessage, setBackupMessage] = useState<string | null>(null)
+  const [backupJob, setBackupJob] = useState<ExternalBackupJob | null>(null)
+
+  useEffect(() => {
+    void getLatestExternalBackupJob(businessId).then(setBackupJob).catch(() => undefined)
+  }, [businessId])
+
+  useEffect(() => {
+    if (!backupJob || ['completed', 'failed'].includes(backupJob.status)) return
+    const timer = window.setTimeout(() => {
+      void processExternalBackupJob(backupJob.id).then(setBackupJob).catch((error: unknown) => {
+        setErrorMessage(error instanceof Error ? error.message : 'No fue posible continuar el respaldo externo.')
+      })
+    }, 800)
+    return () => window.clearTimeout(timer)
+  }, [backupJob])
 
   async function loadReport(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -48,7 +64,7 @@ export function ReportsPanel({ businessId, timezone }: ReportsPanelProps) {
   }
 
   async function generateExport(action: () => Promise<void>) {
-    setIsExporting(true); setErrorMessage(null)
+    setIsExporting(true); setErrorMessage(null); setBackupMessage(null)
     try { await action() } catch (error) { setErrorMessage(error instanceof Error ? error.message : 'No fue posible generar la descarga.') }
     finally { setIsExporting(false) }
   }
@@ -85,8 +101,11 @@ export function ReportsPanel({ businessId, timezone }: ReportsPanelProps) {
     </>}
     <section className="report-list" aria-label="Exportación y respaldo">
       <h3>Exportación y respaldo</h3>
-      <p className="muted">El CSV y el JSON facilitan consulta o traslado; no sustituyen un respaldo técnico. Mantén una copia independiente fuera del proyecto.</p>
-      <div className="dashboard-actions"><button className="button button--compact" disabled={isExporting} type="button" onClick={() => void generateExport(() => downloadStructuredExport(businessId))}>Descargar JSON estructurado</button><button className="button button--compact" disabled={isExporting} type="button" onClick={() => void generateExport(() => createAndDownloadManualBackup(businessId))}>Generar respaldo manual</button></div>
+      <p className="muted">El CSV y el JSON facilitan consulta o traslado; el respaldo externo se marca como válido solo después de verificar datos, manifiesto y adjuntos.</p>
+      <div className="dashboard-actions"><button className="button button--compact" disabled={isExporting} type="button" onClick={() => void generateExport(() => downloadStructuredExport(businessId))}>Descargar JSON estructurado</button><button className="button button--compact" disabled={isExporting} type="button" onClick={() => void generateExport(() => createAndDownloadManualBackup(businessId))}>Descargar respaldo local</button><button className="button button--compact" disabled={isExporting || (backupJob !== null && !['completed', 'failed'].includes(backupJob.status))} type="button" onClick={() => void generateExport(async () => { const job = await startExternalBackup(businessId); setBackupJob(job); setBackupMessage(`Respaldo externo iniciado: ${job.id.slice(0, 8)}.`) })}>Respaldar externamente</button></div>
+      {backupMessage ? <p className="notice" role="status">{backupMessage}</p> : null}
+      {backupJob ? <p className="notice" role={backupJob.status === 'failed' ? 'alert' : 'status'}>Respaldo {backupJob.status}: {backupJob.progress_percent}% ({backupJob.verified_files}/{backupJob.total_files} archivos verificados).{backupJob.status === 'completed' ? ' El conjunto y manifiesto quedaron verificados.' : ''}{backupJob.status === 'failed' ? ` ${backupJob.error_message ?? 'Puedes reanudarlo desde el último archivo verificado.'}` : ''}</p> : null}
+      {backupJob?.status === 'failed' ? <div className="dashboard-actions"><button className="button button--compact" type="button" onClick={() => void generateExport(async () => { setBackupJob(await retryExternalBackupJob(backupJob.id)); setBackupMessage('Respaldo reanudado desde el último archivo verificado.') })}>Reanudar respaldo</button></div> : null}
     </section>
   </section>
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { BusinessSelector } from '../features/businesses/components/BusinessSelector'
 import {
@@ -6,16 +6,8 @@ import {
   type BusinessMembership,
 } from '../features/businesses/services/businessService'
 import { LoginForm } from '../features/auth/components/LoginForm'
-import { CatalogPanel } from '../features/catalog/components/CatalogPanel'
-import { CashRegisterPanel } from '../features/cash-register/components/CashRegisterPanel'
-import { PurchasePanel } from '../features/purchases/components/PurchasePanel'
-import { SalesPanel } from '../features/sales/components/SalesPanel'
-import { SaleAuthorizationPanel } from '../features/sales/components/SaleAuthorizationPanel'
-import { OperationsPanel } from '../features/operations/components/OperationsPanel'
 import { ApplicationStatus } from '../features/dashboard/components/ApplicationStatus'
 import { OperationalDashboard } from '../features/dashboard/components/OperationalDashboard'
-import { ReportsPanel } from '../features/reports/components/ReportsPanel'
-import { MemberManagement } from '../features/users/components/MemberManagement'
 import {
   getPendingBusinessInvitations,
   type PendingBusinessInvitation,
@@ -23,9 +15,22 @@ import {
 import { getCurrentSession, signOut } from '../services/auth/authService'
 import { clearOfflineDataForUser } from '../features/sales/services/offlineSalesService'
 import { isSupabaseConfigured } from '../services/api/supabaseClient'
+import { type ActiveView, viewFromLocation } from './navigation'
 
 type AppState = 'loading' | 'ready' | 'error'
-type ActiveView = 'home' | 'inventory' | 'operations' | 'more' | 'sell'
+
+const CatalogPanel = lazy(async () => ({ default: (await import('../features/catalog/components/CatalogPanel')).CatalogPanel }))
+const CashRegisterPanel = lazy(async () => ({ default: (await import('../features/cash-register/components/CashRegisterPanel')).CashRegisterPanel }))
+const PurchasePanel = lazy(async () => ({ default: (await import('../features/purchases/components/PurchasePanel')).PurchasePanel }))
+const SalesPanel = lazy(async () => ({ default: (await import('../features/sales/components/SalesPanel')).SalesPanel }))
+const SaleAuthorizationPanel = lazy(async () => ({ default: (await import('../features/sales/components/SaleAuthorizationPanel')).SaleAuthorizationPanel }))
+const OperationsPanel = lazy(async () => ({ default: (await import('../features/operations/components/OperationsPanel')).OperationsPanel }))
+const ReportsPanel = lazy(async () => ({ default: (await import('../features/reports/components/ReportsPanel')).ReportsPanel }))
+const MemberManagement = lazy(async () => ({ default: (await import('../features/users/components/MemberManagement')).MemberManagement }))
+
+function LazyPanel({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<p className="muted" role="status">Cargando módulo…</p>}>{children}</Suspense>
+}
 
 export function App() {
   const [appState, setAppState] = useState<AppState>('loading')
@@ -35,7 +40,12 @@ export function App() {
   const [selectedBusiness, setSelectedBusiness] = useState<BusinessMembership | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [cashRefreshToken, setCashRefreshToken] = useState(0)
-  const [activeView, setActiveView] = useState<ActiveView>('home')
+  const [activeView, setActiveView] = useState<ActiveView>(viewFromLocation)
+
+  const navigate = useCallback((view: ActiveView) => {
+    window.location.hash = view === 'home' ? '' : view
+    setActiveView(view)
+  }, [])
 
   const loadMemberships = useCallback(async () => {
     try {
@@ -78,6 +88,12 @@ export function App() {
     return () => window.clearTimeout(taskId)
   }, [loadSession])
 
+  useEffect(() => {
+    const handleHashChange = () => setActiveView(viewFromLocation())
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
   async function handleAuthenticated() {
     const nextSession = await getCurrentSession()
     setSession(nextSession)
@@ -91,7 +107,7 @@ export function App() {
     setMemberships([])
     setPendingInvitations([])
     setSelectedBusiness(null)
-    setActiveView('home')
+    navigate('home')
   }
 
   if (appState === 'loading') {
@@ -145,7 +161,7 @@ export function App() {
           onInvitationAccepted={loadMemberships}
           onBusinessSelected={(membership) => {
             setSelectedBusiness(membership)
-            setActiveView('home')
+            navigate('home')
           }}
         />
       </main>
@@ -161,25 +177,25 @@ export function App() {
         </p>
         <ApplicationStatus />
         <nav aria-label="Navegación principal" className="app-navigation">
-          <button className="button button--compact" onClick={() => setActiveView('home')} type="button">Inicio</button>
-          <button className="button button--compact" onClick={() => setActiveView('sell')} type="button">Vender</button>
-          <button className="button button--compact" onClick={() => setActiveView('inventory')} type="button">Inventario</button>
-          <button className="button button--compact" onClick={() => setActiveView('operations')} type="button">Operaciones</button>
-          <button className="button button--compact" onClick={() => setActiveView('more')} type="button">Más</button>
+          <button className="button button--compact" onClick={() => navigate('home')} type="button">Inicio</button>
+          <button className="button button--compact" onClick={() => navigate('sell')} type="button">Vender</button>
+          <button className="button button--compact" onClick={() => navigate('inventory')} type="button">Inventario</button>
+          <button className="button button--compact" onClick={() => navigate('operations')} type="button">Operaciones</button>
+          <button className="button button--compact" onClick={() => navigate('more')} type="button">Más</button>
         </nav>
-        {activeView === 'home' ? <OperationalDashboard businessId={selectedBusiness.businessId} isOwner={selectedBusiness.roleCode === 'owner'} onNavigate={setActiveView} /> : null}
-        {activeView === 'inventory' ? <CatalogPanel businessId={selectedBusiness.businessId} canManage={selectedBusiness.roleCode === 'owner'} /> : null}
-        {activeView === 'sell' ? <SalesPanel businessId={selectedBusiness.businessId} onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} userId={session.user.id} /> : null}
-        {activeView === 'operations' ? <>
+        {activeView === 'home' ? <OperationalDashboard businessId={selectedBusiness.businessId} isOwner={selectedBusiness.roleCode === 'owner'} onNavigate={navigate} /> : null}
+        {activeView === 'inventory' ? <LazyPanel><CatalogPanel businessId={selectedBusiness.businessId} canManage={selectedBusiness.roleCode === 'owner'} /></LazyPanel> : null}
+        {activeView === 'sell' ? <LazyPanel><SalesPanel businessId={selectedBusiness.businessId} onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} userId={session.user.id} /></LazyPanel> : null}
+        {activeView === 'operations' ? <LazyPanel><>
           <PurchasePanel businessId={selectedBusiness.businessId} canConfirm={selectedBusiness.roleCode === 'owner'} />
           <CashRegisterPanel businessId={selectedBusiness.businessId} canOpen={selectedBusiness.roleCode === 'owner'} onChanged={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} />
           <OperationsPanel businessId={selectedBusiness.businessId} isOwner={selectedBusiness.roleCode === 'owner'} />
-        </> : null}
-        {activeView === 'more' ? <>
+        </></LazyPanel> : null}
+        {activeView === 'more' ? <LazyPanel><>
           {selectedBusiness.roleCode === 'owner' ? <ReportsPanel businessId={selectedBusiness.businessId} timezone={selectedBusiness.timezone} /> : null}
           {selectedBusiness.roleCode === 'owner' ? <MemberManagement businessId={selectedBusiness.businessId} /> : null}
           {selectedBusiness.roleCode === 'owner' ? <SaleAuthorizationPanel businessId={selectedBusiness.businessId} /> : null}
-        </> : null}
+        </></LazyPanel> : null}
         <button className="button" onClick={() => void handleSignOut()} type="button">
           Cerrar sesión
         </button>

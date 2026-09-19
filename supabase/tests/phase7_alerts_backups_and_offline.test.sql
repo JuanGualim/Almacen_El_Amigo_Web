@@ -1,6 +1,6 @@
 begin;
 
-select plan(11);
+select plan(17);
 
 insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
 values
@@ -36,6 +36,23 @@ select is((select status::text from public.offline_sale_sync_conflicts where id 
 
 select ok((select checksum_sha256 ~ '^[0-9a-f]{64}$' from public.create_manual_business_backup((select business_id from phase7_context))), 'el respaldo manual tiene suma sha256');
 select is((select get_business_structured_export((select business_id from phase7_context)) ->> 'format'), 'almacen-el-amigo-structured-export-v1', 'la exportación JSON tiene formato versionado');
+select is((select get_business_backup_data((select business_id from phase7_context)) ->> 'format'), 'almacen-el-amigo-backup-data-v2', 'el respaldo externo obtiene datos lógicos versionados');
+
+set local role service_role;
+insert into public.external_backup_sets (id, business_id, backup_kind, storage_provider, storage_prefix, created_by)
+select '99999999-9999-4999-8999-999999999994', business_id, 'manual', 's3-compatible', 'backup-sets/phase7/incomplete', '99999999-9999-9999-9999-999999999991' from phase7_context;
+insert into public.external_backup_jobs (id, backup_set_id, business_id, backup_kind, created_by)
+select '99999999-9999-4999-8999-999999999994', '99999999-9999-4999-8999-999999999994', business_id, 'manual', '99999999-9999-9999-9999-999999999991' from phase7_context;
+
+select is((select (public.claim_external_backup_job('99999999-9999-4999-8999-999999999994', '99999999-9999-4999-8999-999999999995') ->> 'status')), 'pending', 'el primer lote reserva un trabajo pendiente');
+select is((select public.claim_external_backup_job('99999999-9999-4999-8999-999999999994', '99999999-9999-4999-8999-999999999996')), null, 'una doble invocación no reserva el mismo lote');
+select is((select status::text from public.external_backup_sets where id = '99999999-9999-4999-8999-999999999994'), 'uploading', 'un conjunto incompleto no es válido ni restaurable');
+select throws_ok($$ insert into public.external_backup_job_files (job_id, ordinal, file_kind, object_key, mime_type, status) values ('99999999-9999-4999-8999-999999999994', 0, 'data', 'backup-sets/phase7/data.json', 'application/json', 'verified') $$, '23514', null, 'un archivo no se marca verificado sin tamaño y checksum');
+
+insert into public.external_backup_sets (id, business_id, backup_kind, status, storage_provider, storage_prefix, manifest, manifest_sha256, verified_at, created_at)
+select gen_random_uuid(), business_id, 'automatic_daily', 'valid', 's3-compatible', 'backup-sets/phase7/retention/' || series, '{}'::jsonb, repeat('0', 64), now(), now() - (series || ' days')::interval
+from phase7_context cross join generate_series(1, 31) series;
+select ok((select id is not null from public.claim_expired_external_backup_set()), 'la retención selecciona solo una diaria válida vencida cuando existe una más reciente');
 
 set local role service_role;
 insert into public.business_memberships (business_id, user_id, role_id, status, created_by)

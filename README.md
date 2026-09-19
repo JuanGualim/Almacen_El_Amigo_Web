@@ -54,8 +54,9 @@ Está disponible la base técnica de la aplicación:
   interrupción; el servidor las valida al sincronizar y conserva conflictos
   para el dueño.
 - Descarga CSV de reportes, JSON estructurado y respaldo manual con manifiesto
-  y checksum SHA-256. Hay instantáneas privadas diarias con retención; siguen
-  pendientes la restauración aislada y una copia binaria externa de adjuntos.
+  y checksum SHA-256. El respaldo externo S3 compatible copia adjuntos privados
+  y exige verificación de cada objeto; el ensayo real de restauración aislada
+  se documenta en `docs/operations/respaldo-externo-y-restauracion.md`.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para
