@@ -43,6 +43,11 @@ Está disponible la base técnica de la aplicación:
 - Resoluciones de defectuosos por reemplazo, regreso a disponible, crédito,
   reembolso o pérdida aceptada; los resultados sin reemplazo requieren al
   dueño y preservan lote, compra, distribuidor y evidencia opcional.
+- Inicio operativo con pendientes filtrados en el servidor según el permiso
+  del usuario, además del estado visible de conexión y de actualización PWA.
+- Reportes sensibles para usuarios autorizados, con periodos calculados en la
+  zona horaria del negocio: ventas, pagos, variantes más vendidas, compras,
+  caja y saldo derivado con distribuidores.
 - Modelo inicial de perfiles, roles, permisos, membresías y auditoría.
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para

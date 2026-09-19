@@ -12,6 +12,9 @@ import { PurchasePanel } from '../features/purchases/components/PurchasePanel'
 import { SalesPanel } from '../features/sales/components/SalesPanel'
 import { SaleAuthorizationPanel } from '../features/sales/components/SaleAuthorizationPanel'
 import { OperationsPanel } from '../features/operations/components/OperationsPanel'
+import { ApplicationStatus } from '../features/dashboard/components/ApplicationStatus'
+import { OperationalDashboard } from '../features/dashboard/components/OperationalDashboard'
+import { ReportsPanel } from '../features/reports/components/ReportsPanel'
 import { MemberManagement } from '../features/users/components/MemberManagement'
 import {
   getPendingBusinessInvitations,
@@ -154,6 +157,7 @@ export function App() {
         <p className="muted">
           Negocio activo · {selectedBusiness.roleName} · {selectedBusiness.timezone}
         </p>
+        <ApplicationStatus />
         <nav aria-label="Navegación principal" className="app-navigation">
           <button className="button button--compact" onClick={() => setActiveView('home')} type="button">Inicio</button>
           <button className="button button--compact" onClick={() => setActiveView('sell')} type="button">Vender</button>
@@ -161,7 +165,7 @@ export function App() {
           <button className="button button--compact" onClick={() => setActiveView('operations')} type="button">Operaciones</button>
           <button className="button button--compact" onClick={() => setActiveView('more')} type="button">Más</button>
         </nav>
-        {activeView === 'home' ? <section className="catalog-panel"><h2>Inicio operativo</h2><p className="muted">Usa Vender para registrar una venta, Inventario para consultar catálogo y Operaciones para compras, caja y controles.</p></section> : null}
+        {activeView === 'home' ? <OperationalDashboard businessId={selectedBusiness.businessId} onNavigate={setActiveView} /> : null}
         {activeView === 'inventory' ? <CatalogPanel businessId={selectedBusiness.businessId} canManage={selectedBusiness.roleCode === 'owner'} /> : null}
         {activeView === 'sell' ? <SalesPanel businessId={selectedBusiness.businessId} onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} /> : null}
         {activeView === 'operations' ? <>
@@ -170,6 +174,7 @@ export function App() {
           <OperationsPanel businessId={selectedBusiness.businessId} isOwner={selectedBusiness.roleCode === 'owner'} />
         </> : null}
         {activeView === 'more' ? <>
+          {selectedBusiness.roleCode === 'owner' ? <ReportsPanel businessId={selectedBusiness.businessId} timezone={selectedBusiness.timezone} /> : null}
           {selectedBusiness.roleCode === 'owner' ? <MemberManagement businessId={selectedBusiness.businessId} /> : null}
           {selectedBusiness.roleCode === 'owner' ? <SaleAuthorizationPanel businessId={selectedBusiness.businessId} /> : null}
         </> : null}

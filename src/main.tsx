@@ -1,15 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { registerSW } from 'virtual:pwa-register'
 import { App } from './app/App'
+import { registerServiceWorker } from './services/pwa/serviceWorker'
 import './styles/tokens.css'
 import './styles/global.css'
 
-registerSW({
-  onNeedRefresh() {
-    window.dispatchEvent(new Event('app-update-ready'))
-  },
-})
+registerServiceWorker()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

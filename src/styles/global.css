@@ -177,6 +177,39 @@ h1 {
   font-size: 0.75rem;
 }
 
+.connection-status,
+.update-status {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.connection-status--online {
+  background: #e0f7ee;
+  color: #00513b;
+}
+
+.connection-status--offline {
+  background: #fff3ed;
+  color: #7d2810;
+}
+
+.update-status {
+  background: #e8f1fb;
+  color: #0f2942;
+}
+
+.text-button {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .business-list {
   display: grid;
   gap: 0.75rem;
@@ -231,6 +264,79 @@ h1 {
 .catalog-panel h3,
 .catalog-panel h4 {
   margin-bottom: 0.5rem;
+}
+
+.section-heading,
+.dashboard-actions,
+.dashboard-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.dashboard-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.dashboard-card h3,
+.dashboard-pending h3,
+.report-list h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.dashboard-card span {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.dashboard-pending,
+.report-list {
+  margin-top: 1.25rem;
+}
+
+.dashboard-list {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-list li {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.dashboard-actions {
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+.dashboard-actions .button {
+  margin-top: 0;
+}
+
+.report-period-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.report-period-form .button {
+  grid-column: 1 / -1;
 }
 
 .catalog-form,
