@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ATTACHMENTS_PER_INVOCATION, canFinalize, nextPendingFiles, resumeStatus, sanitizeBackupError } from '../../../supabase/functions/_shared/backup-job-state.mjs'
+import { ATTACHMENTS_PER_INVOCATION, canFinalize, nextPendingFiles, resumeStatus, sanitizeBackupError, shouldFinalize } from '../../../supabase/functions/_shared/backup-job-state.mjs'
 
 const pending = (ordinal) => ({ ordinal, file_kind: 'attachment', status: 'pending' })
 const verified = (ordinal) => ({ ordinal, file_kind: 'attachment', status: 'verified' })
@@ -26,6 +26,8 @@ describe('external backup batch checkpoints', () => {
     expect(canFinalize([verified(0), pending(1)])).toBe(false)
     expect(canFinalize([verified(0), verified(1)])).toBe(true)
     expect(canFinalize([])).toBe(false)
+    expect(shouldFinalize('uploading', [verified(0), verified(1)])).toBe(true)
+    expect(shouldFinalize('valid', [verified(0), verified(1)])).toBe(false)
   })
 
   it('returns a sanitized provider error without source details', () => {

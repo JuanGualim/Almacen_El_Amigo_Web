@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2'
-import { createS3CompatibleStorage, putAndVerifyObject } from '../_shared/s3-compatible.mjs'
-import { ATTACHMENTS_PER_INVOCATION, calculateProgress, canFinalize, nextPendingFiles, nextVerificationFiles, resumeStatus, sanitizeBackupError, VERIFICATIONS_PER_INVOCATION } from '../_shared/backup-job-state.mjs'
+import { createS3CompatibleStorage, putAndVerifyObject, verifyExistingObject } from '../_shared/s3-compatible.mjs'
+import { ATTACHMENTS_PER_INVOCATION, calculateProgress, canFinalize, nextPendingFiles, nextVerificationFiles, resumeStatus, sanitizeBackupError, shouldFinalize, VERIFICATIONS_PER_INVOCATION } from '../_shared/backup-job-state.mjs'
 
 type BackupKind = 'manual' | 'automatic_daily' | 'automatic_monthly'
 type JobStatus = 'pending' | 'exporting' | 'copying_attachments' | 'verifying' | 'finalizing' | 'completed' | 'failed'
@@ -182,7 +182,7 @@ async function verifyBatch(admin: SupabaseClient, storage: Storage, job: Job, le
   if (files.some((file) => file.status !== 'verified')) throw new Error('No se puede finalizar un respaldo con archivos sin verificar.')
   const batch = nextVerificationFiles(files, job.verification_cursor, VERIFICATIONS_PER_INVOCATION)
   const verificationStarted = performance.now()
-  for (const file of batch) { const head = await storage.headObject(file.object_key); if (!head || head.contentLength !== file.size_bytes || head.sha256 !== file.checksum_sha256) throw new Error('La verificación final de un objeto no coincidió.') }
+  for (const file of batch) await verifyExistingObject(storage, file.object_key, file.size_bytes as number, file.checksum_sha256 as string)
   const nextCursor = job.verification_cursor + batch.length
   await updateProgress(admin, job, leaseToken, nextCursor >= files.length ? 'finalizing' : 'verifying', files, { final_head_verification: performance.now() - verificationStarted }, { verification_cursor: nextCursor })
 }
@@ -192,18 +192,19 @@ async function finalizeJob(admin: SupabaseClient, storage: Storage, job: Job, le
   if (!canFinalize(files)) throw new Error('No se puede crear el manifiesto de un conjunto incompleto.')
   const { data: backupSet, error: setError } = await admin.from('external_backup_sets').select('storage_prefix, status').eq('id', job.backup_set_id).single()
   if (setError || !backupSet) throw new Error('No fue posible recuperar el conjunto de respaldo.')
-  if (backupSet.status === 'uploading') {
-    const manifestKey = `${backupSet.storage_prefix}/manifest.json`
-    const manifest = { format: 'almacen-el-amigo-external-backup-v1', backup_set_id: job.backup_set_id, business_id: job.business_id, backup_kind: job.backup_kind, created_at: new Date().toISOString(), manifest_key: manifestKey, files: files.map((file) => ({ key: file.object_key, kind: file.file_kind, size_bytes: file.size_bytes, mime_type: file.mime_type, sha256: file.checksum_sha256, business_id: job.business_id, related_record: file.related_record, source: file.file_kind === 'attachment' ? { bucket_id: file.source_bucket_id, name: file.source_name } : undefined })) }
-    const manifestStarted = performance.now()
-    const verified = await putAndVerifyObject(storage, manifestKey, new TextEncoder().encode(`${JSON.stringify(manifest)}\n`), 'application/json')
-    const { error: setUpdateError } = await admin.from('external_backup_sets').update({ status: 'valid', manifest, manifest_sha256: verified.sha256, verified_at: new Date().toISOString() }).eq('id', job.backup_set_id).eq('status', 'uploading')
-    if (setUpdateError) throw new Error('No fue posible validar el conjunto externo.')
-    const timing = { ...(job.timing_ms ?? {}), manifest_upload_and_verify: (job.timing_ms?.manifest_upload_and_verify ?? 0) + Math.round(performance.now() - manifestStarted) }
-    await updateJob(admin, job, leaseToken, { status: 'completed', progress_percent: 100, timing_ms: timing, error_message: null })
+  if (backupSet.status === 'valid') {
+    await updateJob(admin, job, leaseToken, { status: 'completed', progress_percent: 100, error_message: null })
     return
   }
-  await updateJob(admin, job, leaseToken, { status: 'completed', progress_percent: 100, error_message: null })
+  if (!shouldFinalize(backupSet.status, files)) throw new Error('El conjunto no está disponible para una finalización única.')
+  const manifestKey = `${backupSet.storage_prefix}/manifest.json`
+  const manifest = { format: 'almacen-el-amigo-external-backup-v1', backup_set_id: job.backup_set_id, business_id: job.business_id, backup_kind: job.backup_kind, created_at: new Date().toISOString(), manifest_key: manifestKey, files: files.map((file) => ({ key: file.object_key, kind: file.file_kind, size_bytes: file.size_bytes, mime_type: file.mime_type, sha256: file.checksum_sha256, business_id: job.business_id, related_record: file.related_record, source: file.file_kind === 'attachment' ? { bucket_id: file.source_bucket_id, name: file.source_name } : undefined })) }
+  const manifestStarted = performance.now()
+  const verified = await putAndVerifyObject(storage, manifestKey, new TextEncoder().encode(`${JSON.stringify(manifest)}\n`), 'application/json')
+  const { error: setUpdateError } = await admin.from('external_backup_sets').update({ status: 'valid', manifest, manifest_sha256: verified.sha256, verified_at: new Date().toISOString() }).eq('id', job.backup_set_id).eq('status', 'uploading')
+  if (setUpdateError) throw new Error('No fue posible validar el conjunto externo.')
+  const timing = { ...(job.timing_ms ?? {}), manifest_upload_and_verify: (job.timing_ms?.manifest_upload_and_verify ?? 0) + Math.round(performance.now() - manifestStarted) }
+  await updateJob(admin, job, leaseToken, { status: 'completed', progress_percent: 100, timing_ms: timing, error_message: null })
 }
 
 async function processJob(admin: SupabaseClient, storage: Storage, jobId: string): Promise<Job | null> {

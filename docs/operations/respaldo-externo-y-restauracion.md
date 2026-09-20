@@ -72,8 +72,12 @@ el token en una URL, un repositorio o un navegador.
 Cada conjunto usa un prefijo único y contiene `backup-data.json`,
 `structured-export.json`, cada adjunto y `manifest.json`. El manifiesto guarda
 ruta, tamaño, MIME, negocio, registro relacionado cuando existe y SHA-256.
-Después de cada subida, el servidor hace `HEAD` y descarga el objeto para
-comparar tamaño y SHA-256 antes de marcar el conjunto como `valid`.
+Después de cada subida, el servidor hace `HEAD` para comprobar existencia y
+descarga el objeto para comprobar su tamaño y recalcular su SHA-256 antes de
+marcar el conjunto como `valid`. Los metadatos y longitudes de `HEAD` se
+conservan solo para diagnóstico porque un proveedor compatible puede
+transformarlos; la comprobación criptográfica sobre los bytes descargados es
+obligatoria. La verificación final procesa un archivo por invocación.
 La tabla del trabajo registra, sin contenido ni secretos, los milisegundos de
 generación de datos y JSON, descarga de adjuntos, subida/verificación, revisión
 final y manifiesto; también conserva el número de intentos. Esto permite
@@ -108,14 +112,17 @@ literal `RESTORE_ISOLATED_CONFIRMATION=LOCAL_ISOLATED_SUPABASE`.
    para el dueño. Copia solamente la ruta, no las credenciales.
 4. En una terminal administrativa local, exporta las variables S3 desde tu
    archivo secreto y define además `BACKUP_MANIFEST_KEY`,
+   `BACKUP_MANIFEST_SHA256`,
    `RESTORE_SUPABASE_DB_URL`, `RESTORE_SUPABASE_URL`,
    `RESTORE_SUPABASE_SERVICE_ROLE_KEY` y
    `RESTORE_ISOLATED_CONFIRMATION=LOCAL_ISOLATED_SUPABASE`.
 5. Ejecuta `node scripts/backup/restore-external-backup.mjs`.
 
-El restaurador descarga y verifica todos los objetos antes de escribir datos,
-recrea los datos y adjuntos en la instancia aislada, compara las cantidades de
-tablas y valida totales de ventas, pagos, compras y cantidades de lote. Genera
-un informe JSON local con éxito o fallo. Usa únicamente datos ficticios para el
-ensayo. Si falla, conserva el informe, destruye la instancia aislada y corrige
-la causa antes de repetirlo; nunca reutilices esa instancia como producción.
+El restaurador valida primero la estructura del manifiesto, sus rutas, negocio,
+MIME y checksums; luego descarga y verifica todos los objetos antes de escribir
+datos. Recrea los datos y adjuntos en la instancia aislada, compara las
+cantidades de tablas y valida totales de ventas, pagos, compras y cantidades de
+lote. Genera un informe JSON local tanto de éxito como de fallo. Usa únicamente
+datos ficticios para el ensayo. Si falla, conserva el informe, destruye la
+instancia aislada y corrige la causa antes de repetirlo; nunca reutilices esa
+instancia como producción.

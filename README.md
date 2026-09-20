@@ -96,7 +96,6 @@ docker info
 ```bash
 npm ci
 ```
-
 `node_modules` no se sube al repositorio. Se reconstruye siempre desde
 `package-lock.json` con este comando.
 

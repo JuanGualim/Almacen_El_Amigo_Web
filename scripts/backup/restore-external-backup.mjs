@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { createS3CompatibleStorage, sha256Hex } from '../../supabase/functions/_shared/s3-compatible.mjs'
+import { validateExternalBackupManifest } from './backup-manifest.mjs'
 
 const required = ['BACKUP_S3_ENDPOINT', 'BACKUP_S3_BUCKET', 'BACKUP_S3_ACCESS_KEY_ID', 'BACKUP_S3_SECRET_ACCESS_KEY', 'BACKUP_MANIFEST_KEY', 'RESTORE_SUPABASE_DB_URL', 'RESTORE_SUPABASE_URL', 'RESTORE_SUPABASE_SERVICE_ROLE_KEY']
 
@@ -23,9 +24,9 @@ function assertLocalIsolatedDestination() {
   }
 }
 
-async function readVerifiedObject(storage, key, expectedChecksum, expectedSize) {
+async function readVerifiedObject(storage, key, expectedChecksum) {
   const head = await storage.headObject(key)
-  if (!head || head.sha256 !== expectedChecksum || (expectedSize !== undefined && head.contentLength !== expectedSize)) {
+  if (!head) {
     throw new Error('Un objeto del manifiesto no coincide con sus metadatos remotos.')
   }
   const body = new Uint8Array(await (await storage.getObject(key)).arrayBuffer())
@@ -74,6 +75,14 @@ async function restoreAttachment(baseUrl, serviceRoleKey, file, body) {
   }
 }
 
+async function writeReport(report) {
+  const reportDirectory = process.env.RESTORE_REPORT_DIRECTORY ?? 'tmp/restore-reports'
+  await mkdir(reportDirectory, { recursive: true })
+  const reportPath = join(reportDirectory, `restore-${report.backup_set_id ?? 'failed'}-${Date.now()}.json`)
+  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 })
+  return reportPath
+}
+
 async function main() {
   for (const name of required) requireEnvironment(name)
   assertLocalIsolatedDestination()
@@ -83,15 +92,13 @@ async function main() {
   })
   const manifestKey = requireEnvironment('BACKUP_MANIFEST_KEY')
   const manifestHead = await storage.headObject(manifestKey)
-  if (!manifestHead?.sha256) throw new Error('El manifiesto remoto no tiene checksum verificable.')
-  const manifestBytes = await readVerifiedObject(storage, manifestKey, manifestHead.sha256)
-  const manifest = JSON.parse(new TextDecoder().decode(manifestBytes))
-  if (manifest.format !== 'almacen-el-amigo-external-backup-v1' || !Array.isArray(manifest.files) || typeof manifest.business_id !== 'string') {
-    throw new Error('El manifiesto no corresponde a un respaldo externo compatible.')
-  }
+  const manifestChecksum = process.env.BACKUP_MANIFEST_SHA256 ?? manifestHead?.sha256
+  if (!manifestHead || !manifestChecksum || !/^[0-9a-f]{64}$/.test(manifestChecksum)) throw new Error('Indica BACKUP_MANIFEST_SHA256 para verificar el manifiesto remoto.')
+  const manifestBytes = await readVerifiedObject(storage, manifestKey, manifestChecksum)
+  const manifest = validateExternalBackupManifest(JSON.parse(new TextDecoder().decode(manifestBytes)))
 
   const downloaded = new Map()
-  for (const file of manifest.files) downloaded.set(file.key, await readVerifiedObject(storage, file.key, file.sha256, file.size_bytes))
+  for (const file of manifest.files) downloaded.set(file.key, await readVerifiedObject(storage, file.key, file.sha256))
   const dataFile = manifest.files.find((file) => file.kind === 'data')
   if (!dataFile) throw new Error('El conjunto no incluye el respaldo de datos.')
   const dataPayload = JSON.parse(new TextDecoder().decode(downloaded.get(dataFile.key)))
@@ -114,14 +121,17 @@ async function main() {
   }
 
   const report = { status: 'success', backup_set_id: manifest.backup_set_id, business_id: manifest.business_id, restored_at: new Date().toISOString(), restored_table_counts: result.restore.table_counts, attachment_count: manifest.files.filter((file) => file.kind === 'attachment').length, validation: result.validation }
-  const reportDirectory = process.env.RESTORE_REPORT_DIRECTORY ?? 'tmp/restore-reports'
-  await mkdir(reportDirectory, { recursive: true })
-  const reportPath = join(reportDirectory, `restore-${manifest.backup_set_id}.json`)
-  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 })
+  const reportPath = await writeReport(report)
   process.stdout.write(`Restauración aislada correcta. Informe: ${reportPath}\n`)
 }
 
-main().catch((error) => {
-  process.stderr.write(`${error instanceof Error ? error.message : 'La restauración aislada falló.'}\n`)
+main().catch(async (error) => {
+  const message = error instanceof Error ? error.message : 'La restauración aislada falló.'
+  try {
+    const reportPath = await writeReport({ status: 'failed', failed_at: new Date().toISOString(), error: message })
+    process.stderr.write(`${message} Informe: ${reportPath}\n`)
+  } catch {
+    process.stderr.write(`${message}\n`)
+  }
   process.exitCode = 1
 })

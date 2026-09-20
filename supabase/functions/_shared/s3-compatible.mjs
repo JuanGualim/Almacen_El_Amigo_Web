@@ -64,8 +64,9 @@ export function createS3CompatibleStorage(config) {
       const response = await request('HEAD', key)
       if (response.status === 404) return null
       if (!response.ok) throw new Error(`No fue posible verificar el objeto externo (${response.status}).`)
-      const contentLength = Number(response.headers.get('content-length'))
-      if (!Number.isSafeInteger(contentLength) || contentLength < 0) throw new Error('El almacenamiento externo devolvió un tamaño inválido.')
+      const rawContentLength = response.headers.get('content-length')
+      const parsedContentLength = rawContentLength === null ? null : Number(rawContentLength)
+      const contentLength = Number.isSafeInteger(parsedContentLength) && parsedContentLength >= 0 ? parsedContentLength : null
       return { contentLength, contentType: response.headers.get('content-type'), sha256: response.headers.get('x-amz-meta-sha256') }
     },
     async deleteObject(key) {
@@ -78,9 +79,17 @@ export function createS3CompatibleStorage(config) {
 export async function putAndVerifyObject(storage, key, body, contentType) {
   const sha256 = await sha256Hex(body)
   await storage.putObject(key, body, contentType, sha256)
-  const head = await storage.headObject(key)
-  if (!head || head.contentLength !== body.byteLength || head.sha256 !== sha256) throw new Error('La verificación remota por cabecera no coincidió.')
-  const verifiedBody = new Uint8Array(await (await storage.getObject(key)).arrayBuffer())
-  if (verifiedBody.byteLength !== body.byteLength || await sha256Hex(verifiedBody) !== sha256) throw new Error('La verificación remota del checksum no coincidió.')
+  await verifyExistingObject(storage, key, body.byteLength, sha256)
   return { sizeBytes: body.byteLength, sha256 }
+}
+
+export async function verifyExistingObject(storage, key, expectedSize, expectedSha256) {
+  const head = await storage.headObject(key)
+  if (!head) throw new Error('El objeto remoto no existe después de subirlo.')
+  // Algunos proveedores S3 compatibles transforman o eliminan metadatos de
+  // HEAD. La existencia la confirmamos con HEAD; tamaño y SHA-256 se prueban
+  // sobre los bytes que GET devuelve, que es la fuente de verdad.
+  const verifiedBody = new Uint8Array(await (await storage.getObject(key)).arrayBuffer())
+  if (verifiedBody.byteLength !== expectedSize) throw new Error('El tamaño descargado no coincide con el objeto subido.')
+  if (await sha256Hex(verifiedBody) !== expectedSha256) throw new Error('El checksum de los bytes descargados no coincide.')
 }
