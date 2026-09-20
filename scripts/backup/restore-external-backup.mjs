@@ -24,25 +24,37 @@ function assertLocalIsolatedDestination() {
   }
 }
 
-async function readVerifiedObject(storage, key, expectedChecksum) {
+async function readVerifiedObject(storage, key, expectedChecksum, subject, expectedSize) {
   const head = await storage.headObject(key)
   if (!head) {
-    throw new Error('Un objeto del manifiesto no coincide con sus metadatos remotos.')
+    throw new Error(`No se encontró ${subject} en el almacenamiento externo.`)
   }
   const body = new Uint8Array(await (await storage.getObject(key)).arrayBuffer())
-  if (body.byteLength !== head.contentLength || await sha256Hex(body) !== expectedChecksum) {
-    throw new Error('Un objeto del manifiesto no coincide con su checksum.')
+  if (expectedSize !== undefined && body.byteLength !== expectedSize) {
+    throw new Error(`El tamaño de ${subject} no coincide con el manifiesto.`)
+  }
+  if (await sha256Hex(body) !== expectedChecksum) {
+    throw new Error(`El checksum de ${subject} no coincide con el manifiesto.`)
   }
   return body
 }
 
 function runPsql(databaseUrl, script) {
   return new Promise((resolve, reject) => {
-    const process = spawn('psql', ['--no-psqlrc', '--quiet', '--tuples-only', '--no-align', '--set', 'ON_ERROR_STOP=1', databaseUrl], { stdio: ['pipe', 'pipe', 'pipe'] })
+    const process = spawn('psql', ['--no-psqlrc', '--quiet', '--tuples-only', '--no-align', '--set', 'ON_ERROR_STOP=1', '--set', 'VERBOSITY=verbose', databaseUrl], { stdio: ['pipe', 'pipe', 'pipe'] })
     let stdout = ''
+    let stderr = ''
     process.stdout.on('data', (chunk) => { stdout += chunk })
+    process.stderr.on('data', (chunk) => { stderr += chunk })
     process.once('error', () => reject(new Error('No fue posible iniciar psql; instala el cliente PostgreSQL local.')))
-    process.once('close', (code) => code === 0 ? resolve(stdout) : reject(new Error(`La restauración de datos fue rechazada por PostgreSQL (${code}).`)))
+    process.once('close', (code) => {
+      if (code === 0) return resolve(stdout)
+      const sqlState = stderr.match(/ERROR:\s+([0-9A-Z]{5}):/)?.[1]
+      const constraint = stderr.match(/unique constraint "([^"]+)"/)?.[1]
+      const ambiguousReference = stderr.match(/column reference "([^"]+)" is ambiguous/)?.[1]
+      const detail = constraint ? `, restricción ${constraint}` : ambiguousReference ? `, referencia ${ambiguousReference}` : ''
+      reject(new Error(sqlState ? `La restauración de datos fue rechazada por PostgreSQL (SQLSTATE ${sqlState}${detail}).` : `La restauración de datos fue rechazada por PostgreSQL (${code}).`))
+    })
     process.stdin.end(script)
   })
 }
@@ -94,11 +106,14 @@ async function main() {
   const manifestHead = await storage.headObject(manifestKey)
   const manifestChecksum = process.env.BACKUP_MANIFEST_SHA256 ?? manifestHead?.sha256
   if (!manifestHead || !manifestChecksum || !/^[0-9a-f]{64}$/.test(manifestChecksum)) throw new Error('Indica BACKUP_MANIFEST_SHA256 para verificar el manifiesto remoto.')
-  const manifestBytes = await readVerifiedObject(storage, manifestKey, manifestChecksum)
+  const manifestBytes = await readVerifiedObject(storage, manifestKey, manifestChecksum, 'el manifiesto')
   const manifest = validateExternalBackupManifest(JSON.parse(new TextDecoder().decode(manifestBytes)))
 
   const downloaded = new Map()
-  for (const file of manifest.files) downloaded.set(file.key, await readVerifiedObject(storage, file.key, file.sha256))
+  for (const file of manifest.files) {
+    const subject = file.kind === 'data' ? 'el respaldo de datos' : file.kind === 'structured_export' ? 'la exportación JSON' : 'un adjunto'
+    downloaded.set(file.key, await readVerifiedObject(storage, file.key, file.sha256, subject, file.size_bytes))
+  }
   const dataFile = manifest.files.find((file) => file.kind === 'data')
   if (!dataFile) throw new Error('El conjunto no incluye el respaldo de datos.')
   const dataPayload = JSON.parse(new TextDecoder().decode(downloaded.get(dataFile.key)))
