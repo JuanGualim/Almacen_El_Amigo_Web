@@ -226,7 +226,7 @@ export function PurchasePanel({ businessId, canConfirm }: PurchasePanelProps) {
     return variant ? `${variant.productName} · ${variant.variantCode}` : 'Variante de catálogo'
   }
 
-  return <section className="catalog-panel" aria-labelledby="purchase-title">
+  return <section className="catalog-panel purchase-panel" aria-labelledby="purchase-title">
     <h2 id="purchase-title">Compras e inventario</h2>
     <p className="muted">Una compra solo modifica existencias cuando queda confirmada.</p>
 

@@ -200,7 +200,7 @@ export function SalesPanel({ businessId, onSaleConfirmed, refreshToken, userId }
     setMessage('Sincronización terminada. Las ventas en conflicto requieren revisión del dueño.')
   }
 
-  return <section className="catalog-panel" aria-labelledby="sales-title">
+  return <section className="catalog-panel sales-panel" aria-labelledby="sales-title">
     <h2 id="sales-title">Nueva venta</h2>
     {!cashSummary ? <p className="notice">La venta permanece bloqueada hasta que exista una caja abierta.</p> : <form className="catalog-form" onSubmit={handleConfirm}>
       <label className="field">Producto disponible<select value={variantId} onChange={(event) => handleVariantChange(event.target.value)}><option value="">Selecciona</option>{variants.map((variant) => <option key={variant.variantId} value={variant.variantId}>{variant.productName} · {variant.variantCode} · {variant.availableQuantity} disponibles</option>)}</select></label>

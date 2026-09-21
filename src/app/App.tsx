@@ -27,6 +27,7 @@ const SaleAuthorizationPanel = lazy(async () => ({ default: (await import('../fe
 const OperationsPanel = lazy(async () => ({ default: (await import('../features/operations/components/OperationsPanel')).OperationsPanel }))
 const ReportsPanel = lazy(async () => ({ default: (await import('../features/reports/components/ReportsPanel')).ReportsPanel }))
 const MemberManagement = lazy(async () => ({ default: (await import('../features/users/components/MemberManagement')).MemberManagement }))
+const InitialInventoryPanel = lazy(async () => ({ default: (await import('../features/onboarding/components/InitialInventoryPanel')).InitialInventoryPanel }))
 
 function LazyPanel({ children }: { children: ReactNode }) {
   return <Suspense fallback={<p className="muted" role="status">Cargando módulo…</p>}>{children}</Suspense>
@@ -168,21 +169,25 @@ export function App() {
     )
   }
 
-  return (
-    <main className="app-shell">
-      <section className="auth-card" aria-labelledby="welcome-title">
-        <h1 id="welcome-title">{selectedBusiness.businessName}</h1>
-        <p className="muted">
-          Negocio activo · {selectedBusiness.roleName} · {selectedBusiness.timezone}
-        </p>
-        <ApplicationStatus />
-        <nav aria-label="Navegación principal" className="app-navigation">
-          <button className="button button--compact" onClick={() => navigate('home')} type="button">Inicio</button>
-          <button className="button button--compact" onClick={() => navigate('sell')} type="button">Vender</button>
-          <button className="button button--compact" onClick={() => navigate('inventory')} type="button">Inventario</button>
-          <button className="button button--compact" onClick={() => navigate('operations')} type="button">Operaciones</button>
-          <button className="button button--compact" onClick={() => navigate('more')} type="button">Más</button>
-        </nav>
+  return <main className="app-shell app-shell--workspace">
+    <header className="app-topbar">
+      <div className="app-topbar__identity">
+        <div className="brand__icon" aria-hidden="true">↑</div>
+        <div>
+          <strong>{selectedBusiness.businessName}</strong>
+          <span>{selectedBusiness.roleName} · {selectedBusiness.timezone}</span>
+        </div>
+      </div>
+      <ApplicationStatus />
+    </header>
+    <section className="app-workspace" aria-labelledby="workspace-title">
+      <div className="workspace-heading">
+        <div>
+          <span className="eyebrow">Negocio activo</span>
+          <h1 id="workspace-title">{activeView === 'home' ? 'Inicio operativo' : activeView === 'sell' ? 'Punto de venta' : activeView === 'inventory' ? 'Inventario y catálogo' : activeView === 'operations' ? 'Operaciones' : 'Administración'}</h1>
+        </div>
+      </div>
+      <div className="app-content">
         {activeView === 'home' ? <OperationalDashboard businessId={selectedBusiness.businessId} isOwner={selectedBusiness.roleCode === 'owner'} onNavigate={navigate} /> : null}
         {activeView === 'inventory' ? <LazyPanel><CatalogPanel businessId={selectedBusiness.businessId} canManage={selectedBusiness.roleCode === 'owner'} /></LazyPanel> : null}
         {activeView === 'sell' ? <LazyPanel><SalesPanel businessId={selectedBusiness.businessId} onSaleConfirmed={() => setCashRefreshToken((currentToken) => currentToken + 1)} refreshToken={cashRefreshToken} userId={session.user.id} /></LazyPanel> : null}
@@ -192,14 +197,20 @@ export function App() {
           <OperationsPanel businessId={selectedBusiness.businessId} isOwner={selectedBusiness.roleCode === 'owner'} />
         </></LazyPanel> : null}
         {activeView === 'more' ? <LazyPanel><>
+          {selectedBusiness.roleCode === 'owner' ? <InitialInventoryPanel businessId={selectedBusiness.businessId} /> : null}
           {selectedBusiness.roleCode === 'owner' ? <ReportsPanel businessId={selectedBusiness.businessId} timezone={selectedBusiness.timezone} /> : null}
           {selectedBusiness.roleCode === 'owner' ? <MemberManagement businessId={selectedBusiness.businessId} /> : null}
           {selectedBusiness.roleCode === 'owner' ? <SaleAuthorizationPanel businessId={selectedBusiness.businessId} /> : null}
+          <button className="button button--secondary" onClick={() => void handleSignOut()} type="button">Cerrar sesión</button>
         </></LazyPanel> : null}
-        <button className="button" onClick={() => void handleSignOut()} type="button">
-          Cerrar sesión
-        </button>
-      </section>
-    </main>
-  )
+      </div>
+    </section>
+    <nav aria-label="Navegación principal" className="app-navigation">
+      <button aria-current={activeView === 'home' ? 'page' : undefined} className="button button--compact" onClick={() => navigate('home')} type="button"><span aria-hidden="true">⌂</span>Inicio</button>
+      <button aria-current={activeView === 'sell' ? 'page' : undefined} className="button button--compact" onClick={() => navigate('sell')} type="button"><span aria-hidden="true">▣</span>Vender</button>
+      <button aria-current={activeView === 'inventory' ? 'page' : undefined} className="button button--compact" onClick={() => navigate('inventory')} type="button"><span aria-hidden="true">▤</span>Inventario</button>
+      <button aria-current={activeView === 'operations' ? 'page' : undefined} className="button button--compact" onClick={() => navigate('operations')} type="button"><span aria-hidden="true">▧</span>Operaciones</button>
+      <button aria-current={activeView === 'more' ? 'page' : undefined} className="button button--compact" onClick={() => navigate('more')} type="button"><span aria-hidden="true">•••</span>Más</button>
+    </nav>
+  </main>
 }

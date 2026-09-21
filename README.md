@@ -61,6 +61,8 @@ Está disponible la base técnica de la aplicación:
 - Políticas RLS que aíslan la información por negocio.
 - Pruebas unitarias de dinero y permisos, más una prueba de integración para
   acceso cruzado entre negocios.
+- Carga inicial única de inventario desde CSV, validada antes y durante la
+  confirmación, con lotes iniciales auditables para el piloto controlado.
 
 Las existencias nunca se editan directamente. La interfaz actual expone estos
 flujos en paneles operativos mientras se completa la navegación final basada
@@ -141,6 +143,22 @@ npm run dev
 ```
 
 Abre `http://127.0.0.1:3000` en el navegador.
+
+### Datos ficticios de demostración
+
+Después de ejecutar un reinicio local de Supabase, el seed crea un negocio
+independiente llamado **Almacén El Amigo · Modo demostración**. Incluye
+catálogo, inventario, compras, una caja abierta, ventas, alertas y pendientes
+para explorar las pantallas sin usar datos reales.
+
+- Dueña: `dueno.demo@almacen.test`
+- Empleado: `empleado.demo@almacen.test`
+- Contraseña ficticia para ambos: `Demo1234!`
+- PIN ficticio de autorización de la dueña: `246810`
+
+Estos accesos solo existen en la base local. El seed no borra ni modifica otros
+negocios; para cargarlo en una instancia local ya creada se usa el proceso de
+desarrollo documentado por el equipo, nunca un proyecto remoto.
 
 ### 6. Probar invitaciones de empleados
 
